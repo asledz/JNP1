@@ -85,7 +85,7 @@ int main() {
 
   std::regex course_regex("^([0-9]+)((?: (?:(?:2[0-3]|1[0-9]|0?[1-9]):[0-5][0-9]) (?:[a-zA-Z0-9^]+))+)$");
   std::regex ticket_regex("^((?:[a-zA-Z ])+) ((?:[0-9])+\\.[0-9]{2}) ([1-9][0-9]*)$");
-  std::regex query_regex("^\\?( (?:[a-zA-Z0-9^]+) (?:[0-9]+))+$");
+  std::regex query_regex("^\\? (?:[a-zA-Z0-9^]+)( (?:[0-9]+) (?:[a-zA-Z0-9^]+))+$");
 
   std::regex course_number_regex("^([0-9]+)");
   std::regex time_regex("^ ((?:2[0-3]|1[0-9]|0?[1-9]):[0-5][0-9])");
@@ -94,16 +94,14 @@ int main() {
   std::regex ticket_prize_regex("^((?:[0-9])+\\.[0-9]{2})");
   std::regex ticket_valid_regex("^ ([1-9][0-9]*)");
 
-  std::smatch match;
-
-  if(std::regex_match(slowo, match, course_regex)) {
+  if(std::regex_match(slowo, course_regex)) {
     std::cout << "course_regex\n";
-    std::string line_number, time_jprdl, course_name;
+    std::string course_number, time_jprdl, course_name;
 
-    line_number = first_match(slowo, course_number_regex);
-    std::cout << line_number << "\n";
+    course_number = first_match(slowo, course_number_regex);
+    std::cout << course_number << "\n";
 
-    while(std::regex_search(slowo, match, time_regex)) {
+    while(!slowo.empty()) {
       time_jprdl = first_match(slowo, time_regex);
       std::cout << time_jprdl << "\n";
 
@@ -111,7 +109,7 @@ int main() {
       std::cout << course_name << "\n";
     }
   }
-  else if(std::regex_match(slowo, match, ticket_regex)) {
+  else if(std::regex_match(slowo, ticket_regex)) {
     std::cout << "ticket_regex\n";
 
     std::string ticket_name, ticket_prize, ticket_valid;
@@ -125,10 +123,23 @@ int main() {
     ticket_valid = first_match(slowo, ticket_valid_regex);
     std::cout << ticket_valid << "\n";
   }
-  else if(std::regex_match(slowo, match, query_regex)) {
+  else if(std::regex_match(slowo, query_regex)) {
     std::cout << "query_regex\n";
+		slowo.erase(0, 1);
 
+		std::string start, stop, course_number;
 
+		start = first_match(slowo, stop_name_regex);
+		std::cout << start << "\n";
+
+		while(!slowo.empty()) {
+			slowo.erase(0, 1);
+			course_number = first_match(slowo, course_number_regex);
+			std::cout << course_number << "\n";
+
+			stop = first_match(slowo, stop_name_regex);
+			std::cout << stop << "\n";
+		}
   }
 
 	return 0;
