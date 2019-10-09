@@ -1,3 +1,11 @@
+/*
+  ZADANIE KASA BILETOWA
+  JNPI 2019/2020
+  Autorzy:
+  Marcin Kurowski mk406210
+  Anita Śledź as406384
+*/
+
 #include <iostream>
 #include <vector>
 #include <map>
