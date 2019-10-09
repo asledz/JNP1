@@ -36,7 +36,7 @@ int string_to_time (string time) {
 map<int, int> line_id;
 
 // Przechowywanie linii tramwajowych
-// Dla każdej linii(kursu) trzymamy godzinę przyjazdu na przystanek  
+// Dla każdej linii(kursu) trzymamy godzinę przyjazdu na przystanek
 vector<map<string, int>> timetable;
 
 // Opis biletu - dla każdej nazwy trzymamy długość trwania, cenę
@@ -71,8 +71,66 @@ int duration_of_ticket (int id) {
 	return tickets[id].second.second;
 }
 
+std::string first_match(std::string &text, std::regex &r) {
+  std::smatch match;
+  std::regex_search(text, match, r);
+  std::string res = match.str(0);
+  text = match.suffix().str();
+  return res;
+}
+
+int main() {
+  std::string slowo;
+
+  std::getline(std::cin, slowo);
+
+  std::regex course_regex("^([0-9]+)((?: (?:(?:2[0-3]|1[0-9]|0?[1-9]):[0-5][0-9]) (?:[a-zA-Z0-9^]+))+)$");
+  std::regex ticket_regex("^((?:[a-zA-Z ])+) ((?:[0-9])+\\.[0-9]{2}) ([1-9][0-9]*)$");
+  std::regex query_regex("^\\?( (?:[a-zA-Z0-9^]+) (?:[0-9]+))+$");
+
+  std::regex course_number_regex("^([0-9]+)");
+  std::regex time_regex("^ ((?:2[0-3]|1[0-9]|0?[1-9]):[0-5][0-9])");
+  std::regex stop_name_regex("^ ([a-zA-Z0-9^]+)");
+  std::regex ticket_name_regex("^((?:[a-zA-Z ])+)");
+  std::regex ticket_prize_regex("^((?:[0-9])+\\.[0-9]{2})");
+  std::regex ticket_valid_regex("^ ([1-9][0-9]*)");
+
+  std::smatch match;
+
+  if(std::regex_match(slowo, match, course_regex)) {
+    std::cout << "course_regex\n";
+    std::string line_number, time_jprdl, course_name;
+
+    line_number = first_match(slowo, course_number_regex);
+    std::cout << line_number << "\n";
+
+    while(std::regex_search(slowo, match, time_regex)) {
+      time_jprdl = first_match(slowo, time_regex);
+      std::cout << time_jprdl << "\n";
+
+      course_name = first_match(slowo, stop_name_regex);
+      std::cout << course_name << "\n";
+    }
+  }
+  else if(std::regex_match(slowo, match, ticket_regex)) {
+    std::cout << "ticket_regex\n";
+
+    std::string ticket_name, ticket_prize, ticket_valid;
+
+    ticket_name = first_match(slowo, ticket_name_regex);
+    std::cout << ticket_name << "\n";
+
+    ticket_prize = first_match(slowo, ticket_prize_regex);
+    std::cout << ticket_prize << "\n";
+
+    ticket_valid = first_match(slowo, ticket_valid_regex);
+    std::cout << ticket_valid << "\n";
+  }
+  else if(std::regex_match(slowo, match, query_regex)) {
+    std::cout << "query_regex\n";
 
 
-int main () {
+  }
+
 	return 0;
 }
