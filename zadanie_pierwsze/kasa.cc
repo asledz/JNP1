@@ -3,8 +3,7 @@
 #include <map>
 #include <set>
 #include <string>
-
-using namespace std;
+#include <regex>
 
 /* Funkcje użytkowe */
 
@@ -18,7 +17,7 @@ int time_to_minutes (int hour, int minutes) {
 
 // Funkcja konwertująca string z opisem godziny do minut.
 // W przypadku niepoprawnej godziny, zwraca -1.
-int string_to_time (string time) {
+int string_to_time (std::string time) {
 	if(time.size() < 4 || time.size() > 5) {
 		return -1;
 	}
@@ -33,17 +32,17 @@ int string_to_time (string time) {
 /* Funkcje obsługi rozkładu jazdy */
 
 // Skalowanie numerów linii
-map<int, int> line_id;
+std::map<int, int> line_id;
 
 // Przechowywanie linii tramwajowych
 // Dla każdej linii(kursu) trzymamy godzinę przyjazdu na przystanek
-vector<map<string, int>> timetable;
+std::vector<std::map<std::string, int>> timetable;
 
 // Opis biletu - dla każdej nazwy trzymamy długość trwania, cenę
-vector<pair<string, pair<double, int>>> tickets;
+std::vector<std::pair<std::string, std::pair<double, int>>> tickets;
 
 // Sprawdza, czy dany numer linii kursu tramwajowego zatrzymuje się o danej godzinie na przystanku.
-bool stop_exists (int number_of_the_line, string name_of_the_stop, int time) {
+bool stop_exists (int number_of_the_line, std::string name_of_the_stop, int time) {
 	// nie istnieje taka linia tramwajowa
 	if(line_id.find(number_of_the_line) == line_id.end() ) {
 		return false;
@@ -59,7 +58,7 @@ bool stop_exists (int number_of_the_line, string name_of_the_stop, int time) {
 
 /* Funkcje obługi biletów */
 
-string name_of_ticket(int id) {
+std::string name_of_ticket(int id) {
 	return tickets[id].first;
 }
 
