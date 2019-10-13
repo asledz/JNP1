@@ -86,6 +86,98 @@ std::string first_match(std::string &text, std::regex &r) {
   return res;
 }
 
+/* Algorytm plecakowy */
+
+void knapsack_algorithm (int duration) {
+  int time = time_to_minutes(21, 21) - time_to_minutes(5, 55) + 1;
+  int one_ticket[time], two_tickets[time], three_tickets[time];
+  // Ustawienie tablic na -1
+  for(int i = 0; i < time; i++) {
+    one_ticket[0] = -1;
+    two_tickets[0] = -1;
+    three_tickets[0] = -1;
+  }
+  // iteracja po jednym bilecie 
+  for(int i = 0; i < tickets.size(); i++) {
+    if (duration_of_ticket(i) < time - 1) {
+      if (one_ticket[duration_of_ticket(i)] == -1) {
+        one_ticket[duration_of_ticket(i)] = i;
+      }
+      else {
+        if (prize_of_ticket(i) <= prize_of_ticket(one_ticket[duration_of_ticket(i)])) {
+          one_ticket[duration_of_ticket(i)] = i;
+        }
+      }
+    }
+  }
+  // iteracja po drugim bilecie
+  for(int i = 0; i < tickets.size(); i++) {
+    for(int j = 1; j < time; j++) {
+      if(duration_of_ticket(i) + j < time - 1 && one_ticket[j] != -1) {
+        if(two_tickets[duration_of_ticket(i) + j] == -1) {
+          two_tickets[duration_of_ticket(i) + j] = i;
+        }
+        else {
+          if(prize_of_ticket(i) <= prize_of_ticket(two_tickets[duration_of_ticket(i) + j])) {
+            two_tickets[duration_of_ticket(i) + j] = i;
+          }
+        }
+      }
+    }
+  }
+  // iteracja po trzecim bilecie
+  for(int i = 0; i < tickets.size(); i++) {
+    for(int j = 1; j < time; j++) {
+      if(duration_of_ticket(i) + j < time - 1 && two_tickets[j] != -1 ) {
+        if(three_tickets[duration_of_ticket(i) + j] == -1) {
+          three_tickets[duration_of_ticket(i) + j] = i;
+        }
+        else {
+          if(prize_of_ticket(i) <= prize_of_ticket(three_tickets[duration_of_ticket(i) + j])) {
+            three_tickets[duration_of_ticket(i) + j] = i;
+          }
+        }
+      }
+    }
+  }
+  // znalezienie najtanszego rozwiazania 
+  int one_ticket_solution = MAX_INT, one_ticket_start;
+  int two_tickets_solution = MAX_INT, two_tickets_start;
+  int three_tickets_solution = MAX_INT, three_tickets_start;
+  for (int i = duration; i < time; i++) {
+    if (one_ticket_solution > prize_of_ticket(one_ticket[i])) {
+      one_ticket_start = i;
+      one_ticket_solution = prize_of_ticket(one_ticket[i]);
+    }
+  } 
+
+  for (int i = duration; i < time; i++) {
+    if (two_tickets_solution > prize_of_ticket(two_tickets[i]) 
+                  + prize_of_ticket(one_ticket[i - duration_of_ticket(two_tickets[i])])) {
+      two_tickets_start = i;
+      two_tickets_solution = prize_of_ticket(two_tickets[i]) 
+                  + prize_of_ticket(one_ticket[i - duration_of_ticket(two_tickets[i])]);
+    }
+  }
+
+  for (int i = duration; i < time; i++) {
+    if(three_tickets_solution > prize_of_ticket(three_tickets[i]) 
+                  + prize_of_ticket(two_tickets[i - duration_of_ticket(three_tickets[i])])
+                  + prize_of_ticket(one_ticket[i - duration_of_ticket(three_tickets[i] 
+                                   - duration_of_ticket(two_tickets[i - duration_of_ticket(three_tickets[i])] ))] ) )  {
+      three_tickets_start = i;
+      three_tickets_solution = prize_of_ticket(three_tickets[i]) 
+                  + prize_of_ticket(two_tickets[i - duration_of_ticket(three_tickets[i])])
+                  + prize_of_ticket(one_ticket[i - duration_of_ticket(three_tickets[i] 
+                                   - duration_of_ticket(two_tickets[i - duration_of_ticket(three_tickets[i])] ))] ); 
+    }
+  }
+
+  cout << one_ticket_solution << " " << two_tickets_solution << " " << three_tickets_solution << "\n";
+
+}
+
+
 int main() {
   std::string slowo;
 
