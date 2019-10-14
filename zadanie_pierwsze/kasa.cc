@@ -37,12 +37,25 @@ int string_to_time (std::string time) {
 	return time_to_minutes(hours, minutes);
 }
 
+// Funkcja konwertująca string do liczby zmiennoprzecinkowej
+// o rozwinięciu dziesiętnym długosci 2
+double string_to_double (std::string &text) {
+	double power = 0.01;
+	double result = 0;
+	for (int i=text.size() - 1; i >= 0; i--) {
+		if (text[i] == '.') continue;
+		result += power * char_to_int(text[i]);
+		power *= 10;
+	}
+	return result;
+}
+
 // Funkcja konwertująca string do liczby całkowitej
-int string_to_int (std::string integer) {
+int string_to_int (std::string &text) {
 	int power = 1;
 	int result = 0;
-	for (int i=integer.size() - 1; i >= 0; i--) {
-		result += power * char_to_int(integer[i]);
+	for (int i=text.size() - 1; i >= 0; i--) {
+		result += power * char_to_int(text[i]);
 		power *= 10;
 	}
 	return result;
