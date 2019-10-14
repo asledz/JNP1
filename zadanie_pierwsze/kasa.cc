@@ -13,7 +13,9 @@
 #include <string>
 #include <regex>
 
-/* Funkcje użytkowe */
+/* Funkcje użytkowe i stałe */
+
+const int MAX_INT = 2147483647;
 
 int char_to_int(char num) {
 	return num - '0';
@@ -70,6 +72,10 @@ std::string name_of_ticket(int id) {
 	return tickets[id].first;
 }
 
+void add_ticket(std::string name, int duration, double prize) {
+  tickets.push_back((std::make_pair(name, std::make_pair(prize, duration))));
+}
+
 double prize_of_ticket (int id) {
 	return tickets[id].second.first;
 }
@@ -86,99 +92,119 @@ std::string first_match(std::string &text, std::regex &r) {
   return res;
 }
 
-/* Algorytm plecakowy */
+/* Algorytm plecakowy i funkcje pomocnicze */
 
-void knapsack_algorithm (int duration) {
-  int time = time_to_minutes(21, 21) - time_to_minutes(5, 55) + 1;
-  int one_ticket[time], two_tickets[time], three_tickets[time];
-  // Ustawienie tablic na -1
-  for(int i = 0; i < time; i++) {
-    one_ticket[0] = -1;
-    two_tickets[0] = -1;
-    three_tickets[0] = -1;
+void set_array_to(int value, int size, int tab[]) {
+  for(int i = 0; i < size; i++) {
+    tab[i] = value;
   }
-  // iteracja po jednym bilecie 
+}
+
+void print_all_the_tickets () {
+  for (int i = 0; i < tickets.size(); i++) {
+    std::cout << "ticket[" << i << "] --> " << name_of_ticket(i) << " kosztuje  " << prize_of_ticket(i) << "  i trwa " << duration_of_ticket(i) << "\n";
+  }
+}
+
+void one_ticket_iteration (int one_ticket[], int time) {
   for(int i = 0; i < tickets.size(); i++) {
-    if (duration_of_ticket(i) < time - 1) {
-      if (one_ticket[duration_of_ticket(i)] == -1) {
+    if(duration_of_ticket(i) < time) {
+      if(one_ticket[duration_of_ticket(i)] == -1) {
         one_ticket[duration_of_ticket(i)] = i;
       }
       else {
-        if (prize_of_ticket(i) <= prize_of_ticket(one_ticket[duration_of_ticket(i)])) {
+        if (prize_of_ticket(one_ticket[duration_of_ticket(i)]) >= prize_of_ticket(i)) {
           one_ticket[duration_of_ticket(i)] = i;
         }
       }
     }
+    else {
+      // TO DO: zaimplementować co jeśli wychodzi poza zakres doby.
+    }
   }
-  // iteracja po drugim bilecie
-  for(int i = 0; i < tickets.size(); i++) {
-    for(int j = 1; j < time; j++) {
-      if(duration_of_ticket(i) + j < time - 1 && one_ticket[j] != -1) {
-        if(two_tickets[duration_of_ticket(i) + j] == -1) {
-          two_tickets[duration_of_ticket(i) + j] = i;
+}
+
+void two_tickets_iteration (int one_ticket[], int two_tickets[], int time) {
+  for (int i = 1; i < time; i++) {
+    if (one_ticket[i] != -1) {
+      for (int j = 0; j < tickets.size(); j++) {
+        if (i + duration_of_ticket(j) < time) {
+          if (two_tickets[duration_of_ticket(j) + i] == -1) {
+            two_tickets[duration_of_ticket(j) + i] = j;
+          }
+          else {
+            if(prize_of_ticket(two_tickets[duration_of_ticket(j) + i]) >= prize_of_ticket(j)) {
+              two_tickets[duration_of_ticket(j) + i] = j;
+            }
+          }
         }
         else {
-          if(prize_of_ticket(i) <= prize_of_ticket(two_tickets[duration_of_ticket(i) + j])) {
-            two_tickets[duration_of_ticket(i) + j] = i;
-          }
+          // TO DO: zaimplementować, co jeśli wychodzi poza zakres doby.
         }
       }
     }
   }
-  // iteracja po trzecim bilecie
-  for(int i = 0; i < tickets.size(); i++) {
-    for(int j = 1; j < time; j++) {
-      if(duration_of_ticket(i) + j < time - 1 && two_tickets[j] != -1 ) {
-        if(three_tickets[duration_of_ticket(i) + j] == -1) {
-          three_tickets[duration_of_ticket(i) + j] = i;
-        }
-        else {
-          if(prize_of_ticket(i) <= prize_of_ticket(three_tickets[duration_of_ticket(i) + j])) {
-            three_tickets[duration_of_ticket(i) + j] = i;
+}
+
+void three_tickets_iteration (int two_tickets[], int three_tickets[], int time) {
+  for (int i = 1; i < time; i++) {
+    if(two_tickets[i] != -1) {
+      for(int j = 0; j < tickets.size(); j++) {
+        if(i + duration_of_ticket(j) < time) {
+          if(three_tickets[duration_of_ticket(j) + i] == -1) {
+            three_tickets[duration_of_ticket(j) + i] = j;
+          }
+          else {
+            if(prize_of_ticket(three_tickets[duration_of_ticket(j) + i]) >= prize_of_ticket(j)) {
+              three_tickets[duration_of_ticket(j) + i] = j;
+            }
           }
         }
       }
     }
-  }
-  // znalezienie najtanszego rozwiazania 
-  int one_ticket_solution = MAX_INT, one_ticket_start;
-  int two_tickets_solution = MAX_INT, two_tickets_start;
-  int three_tickets_solution = MAX_INT, three_tickets_start;
-  for (int i = duration; i < time; i++) {
-    if (one_ticket_solution > prize_of_ticket(one_ticket[i])) {
-      one_ticket_start = i;
-      one_ticket_solution = prize_of_ticket(one_ticket[i]);
+    else {
+      // TO DO: zaimplementować, co jeśli wychodzi poza zakres doby.
     }
+  }
+}
+
+void knapsack_algorithm (int duration) {
+
+  int time = time_to_minutes(21, 21) - time_to_minutes(5, 55) + 1;
+  int size = time+2;
+  int one_ticket[size], two_tickets[size], three_tickets[size];
+  
+  set_array_to(-1, size, one_ticket);
+  set_array_to(-1, size, two_tickets);
+  set_array_to(-1, size, three_tickets);
+
+  one_ticket_iteration(one_ticket, time);
+  two_tickets_iteration(one_ticket, two_tickets, time);
+  three_tickets_iteration(two_tickets, three_tickets, time);
+
+  /* 
+  debug
+  std::cout << "\nONE TICKET                   TWO TICKETS                  THREE TICKETS\n";
+  for(int i = 0; i < 10; i++) {
+    std::cout << "one_ticket[" << i << "] = " << one_ticket[i] << "           " << "two_tickets[" << i << "] = " << two_tickets[i]<< "               three_tickets[" << i << "] = " << three_tickets[i] << ";\n";
   } 
-
-  for (int i = duration; i < time; i++) {
-    if (two_tickets_solution > prize_of_ticket(two_tickets[i]) 
-                  + prize_of_ticket(one_ticket[i - duration_of_ticket(two_tickets[i])])) {
-      two_tickets_start = i;
-      two_tickets_solution = prize_of_ticket(two_tickets[i]) 
-                  + prize_of_ticket(one_ticket[i - duration_of_ticket(two_tickets[i])]);
-    }
-  }
-
-  for (int i = duration; i < time; i++) {
-    if(three_tickets_solution > prize_of_ticket(three_tickets[i]) 
-                  + prize_of_ticket(two_tickets[i - duration_of_ticket(three_tickets[i])])
-                  + prize_of_ticket(one_ticket[i - duration_of_ticket(three_tickets[i] 
-                                   - duration_of_ticket(two_tickets[i - duration_of_ticket(three_tickets[i])] ))] ) )  {
-      three_tickets_start = i;
-      three_tickets_solution = prize_of_ticket(three_tickets[i]) 
-                  + prize_of_ticket(two_tickets[i - duration_of_ticket(three_tickets[i])])
-                  + prize_of_ticket(one_ticket[i - duration_of_ticket(three_tickets[i] 
-                                   - duration_of_ticket(two_tickets[i - duration_of_ticket(three_tickets[i])] ))] ); 
-    }
-  }
-
-  cout << one_ticket_solution << " " << two_tickets_solution << " " << three_tickets_solution << "\n";
+  */
 
 }
 
-
 int main() {
+
+
+  add_ticket("pierwszy", 1, 1);
+  add_ticket("drugi", 3, 2);
+  add_ticket("trzeci", 1, 0.4);
+
+
+  knapsack_algorithm(3);
+
+  return 0;
+
+  
   std::string slowo;
 
   std::getline(std::cin, slowo);
