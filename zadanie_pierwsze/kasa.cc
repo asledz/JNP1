@@ -37,6 +37,17 @@ int string_to_time (std::string time) {
 	return time_to_minutes(hours, minutes);
 }
 
+// Funkcja konwertująca string do liczby całkowitej
+int string_to_int (std::string integer) {
+	int power = 1;
+	int result = 0;
+	for (int i=integer.size() - 1; i >= 0; i--) {
+		result += power * char_to_int(integer[i]);
+		power *= 10;
+	}
+	return result;
+}
+
 /* Funkcje obsługi rozkładu jazdy */
 
 // Skalowanie numerów linii
@@ -121,7 +132,7 @@ void execute_line(int line_number, std::string line) {
     ticket_name = first_match(line, ticket_name_regex);
     std::cout << ticket_name << "\n";
 
-    ticket_prize = first_match(line, ticket_prize_regex);
+  	ticket_prize = first_match(line, ticket_prize_regex);
     std::cout << ticket_prize << "\n";
 
     ticket_valid = first_match(line, ticket_valid_regex);
