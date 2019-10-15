@@ -39,6 +39,12 @@ int string_to_time (std::string time) {
 	return time_to_minutes(hours, minutes);
 }
 
+void set_array_to(int value, int size, int tab[]) {
+  for(int i = 0; i < size; i++) {
+    tab[i] = value;
+  }
+}
+
 /* Funkcje obsługi rozkładu jazdy */
 
 // Skalowanie numerów linii
@@ -93,12 +99,6 @@ std::string first_match(std::string &text, std::regex &r) {
 }
 
 /* Algorytm plecakowy i funkcje pomocnicze */
-
-void set_array_to(int value, int size, int tab[]) {
-  for(int i = 0; i < size; i++) {
-    tab[i] = value;
-  }
-}
 
 void print_all_the_tickets () {
   for (int i = 0; i < tickets.size(); i++) {
