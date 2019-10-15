@@ -164,7 +164,7 @@ std::pair<std::string, double> one_ticket_value(int one_ticket[], int time, int 
   return std::make_pair(solution, best_val);
 }
 
-std::pair<std::string, double> two_ticket_value(int one_ticket[], int two_tickets[], int time, int duration) {
+std::pair<std::string, double> two_ticket_value (int one_ticket[], int two_tickets[], int time, int duration) {
   double best_val = MAX_INT;
   int start_point = 0;
   for (int i = duration; i < time; i++) {
@@ -182,14 +182,48 @@ std::pair<std::string, double> two_ticket_value(int one_ticket[], int two_ticket
   }
   int id_st = two_tickets[start_point];
   int id_nd = one_ticket[start_point - duration_of_ticket(id_st)];
-  std::string solution = "! " + name_of_ticket(id_st) + "; " + name_of_ticket(id_st) + "\n";
+  std::string solution = "! " + name_of_ticket(id_st) + "; " + name_of_ticket(id_nd) + "\n";
   return std::make_pair(solution, best_val);  
 }
 
+std::pair<std::string, double> three_ticket_value (int one_ticket[], int two_tickets[], int three_tickets[], int time, int duration) {
+  double best_val = MAX_INT;
+  int start_point = 0;
+  for (int i = duration; i < time; i++) {
+    if (three_tickets[i] > -1) {
+      int id_st = three_tickets[i];
+      int id_nd = two_tickets[i - duration_of_ticket(id_st)];
+      int id_rd = one_ticket[i - duration_of_ticket(id_st) - duration_of_ticket(id_nd)];
+      if(best_val > prize_of_ticket(id_st) + prize_of_ticket(id_nd) + prize_of_ticket(id_rd)) {
+        start_point = i;
+        best_val = prize_of_ticket(id_st) + prize_of_ticket(id_nd) + prize_of_ticket(id_rd);
+      }
+    }
+  }
+  if(best_val == MAX_INT) {
+    return std::make_pair(":-|\n", best_val); 
+  }
+  int id_st = three_tickets[start_point];
+  int id_nd = two_tickets[start_point - duration_of_ticket(id_st)];
+  int id_rd = one_ticket[start_point - duration_of_ticket(id_st) - duration_of_ticket(id_nd)];
+  std::string solution = "! " + name_of_ticket(id_st) + "; " + name_of_ticket(id_nd) + "; " + name_of_ticket(id_rd) + "\n";
+  return std::make_pair(solution, best_val);
+}
+
 void calculate_solution (int one_ticket[], int two_tickets[], int three_tickets[], int time, int duration) {
-  std::cout << "TRWANIE " << duration << ":\n";
-  std::cout << (one_ticket_value(one_ticket, time, duration)).first;
-  std::cout << (two_ticket_value(one_ticket, two_tickets, time, duration)).first;
+  std::pair<std::string, double> solutions[3];
+  solutions[0] = one_ticket_value(one_ticket, time, duration);
+  solutions[1] = two_ticket_value(one_ticket, two_tickets, time, duration);
+  solutions[2] = three_ticket_value(one_ticket, two_tickets, three_tickets, time, duration);
+
+  if (solutions[0].second > solutions[1].second) {
+    std::swap (solutions[0], solutions[1]);
+  }
+  if(solutions[0].second > solutions[2].second) {
+    std::swap(solutions[0], solutions[2]);
+  }
+
+  std::cout << solutions[0].first;
 }
 
 void knapsack_algorithm (int duration) {
@@ -206,11 +240,6 @@ void knapsack_algorithm (int duration) {
   multiple_tickets_iteration(one_ticket, two_tickets, time);
   multiple_tickets_iteration(two_tickets, three_tickets, time);
 
-  // std::cout << "\nONE TICKET                   TWO TICKETS                  THREE TICKETS\n";
-  // for(int i = 0; i < 10; i++) {
-  //   std::cout << "one_ticket[" << i << "] = " << one_ticket[i] << "           " << "two_tickets[" << i << "] = " << two_tickets[i]<< "               three_tickets[" << i << "] = " << three_tickets[i] << ";\n";
-  // } 
-  
   calculate_solution(one_ticket, two_tickets, three_tickets, time, duration);
 
 }
@@ -218,15 +247,16 @@ void knapsack_algorithm (int duration) {
 /* FUNKCJE DO TESTOWANIA */
 
 void testuj_algorytm_plecakowy () {
-  add_ticket("pierwszy", 2, 1);
-  add_ticket("drugi", 3, 2);
-  add_ticket("trzeci", 2, 0.4);
-  print_all_the_tickets();
+  add_ticket("Trwanie 2", 2, 1);
+  add_ticket("Trwanie 3", 3, 2);
+  add_ticket("Tanie trwanie 2", 2, 0.4);
+  // print_all_the_tickets();
 
   knapsack_algorithm(1);
   knapsack_algorithm(2);
   knapsack_algorithm(3);
   knapsack_algorithm(5);
+  knapsack_algorithm(10);
 }
 
 int main() {
