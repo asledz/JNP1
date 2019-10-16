@@ -122,167 +122,95 @@ std::string first_match(std::string &text, std::regex &r) {
   return res;
 }
 
-/* Algorytm plecakowy i funkcje pomocnicze */
+/* Rozwiązanie w n^3 */
 
-void print_all_the_tickets () {
-  for (int i = 0; i < tickets.size(); i++) {
-    std::cout << "ticket[" << i << "] --> " << name_of_ticket(i) << " kosztuje  " << prize_of_ticket(i) << "  i trwa " << duration_of_ticket(i) << "\n";
+void create_output (const int id_st, const int id_nd, const int id_rd) {
+  if(id_st == -1) {
+    std::cout << ":-|\n";
+  }
+  else if(id_nd == -1) {
+    std::cout << "! " << name_of_ticket(id_st) << "\n";
+  }
+  else if(id_rd == -1) {
+    std::cout << "! " << name_of_ticket(id_st) << "; " << name_of_ticket(id_nd) << "\n";
+  }
+  else {
+    std::cout << "! " << name_of_ticket(id_st) << "; " << name_of_ticket(id_nd) << "; " << name_of_ticket(id_rd) << "\n";
   }
 }
 
-void one_ticket_iteration (int one_ticket[], int time) {
+double calculate_cost (const int id_st, const int id_nd, const int id_rd) {
+  double prize = MAX_INT;
+  if (id_st != -1) {
+    prize = prize_of_ticket(id_st);
+  }
+  if (id_nd != -1) {
+    prize += prize_of_ticket(id_nd);
+  }
+  if(id_rd != -1) {
+    prize += prize_of_ticket(id_rd);
+  }
+  return prize;
+}
+
+int calculate_time(const int id_st, const int id_nd, const int id_rd) {
+  int time = 0;
+  if (id_st != -1) {
+    time += duration_of_ticket(id_st);
+  }
+  if (id_nd != -1) {
+    time += duration_of_ticket(id_nd);
+  }
+  if(id_rd != -1) {
+    time += duration_of_ticket(id_rd);
+  }
+  return time;
+}
+
+void change(double &value, const int time, int &st, int &nd, int &rd, int ticket_st, int ticket_nd, int ticket_rd) {
+  if (calculate_cost(ticket_st, ticket_nd, ticket_rd) <= value) {
+    if(calculate_time(ticket_st, ticket_nd, ticket_rd) >= time) {
+      st = ticket_st;
+      nd = ticket_nd;
+      rd = ticket_rd;
+      value = calculate_cost(st, nd, rd);
+    }
+  }
+}
+
+void create_solution(const int duration) {
+  int none = -1;
+  double best_val = MAX_INT;
+  int st = none, nd = none, rd = none;
+  int id_st = none, id_nd = none, id_rd = none;
   for(int i = 0; i < tickets.size(); i++) {
-    if(duration_of_ticket(i) < time) {
-      if(one_ticket[duration_of_ticket(i)] == -1) {
-        one_ticket[duration_of_ticket(i)] = i;
-      }
-      else {
-        if (prize_of_ticket(one_ticket[duration_of_ticket(i)]) >= prize_of_ticket(i)) {
-          one_ticket[duration_of_ticket(i)] = i;
-        }
-      }
-    }
-    else {
-      // TO DO: zaimplementować co jeśli wychodzi poza zakres doby.
-    }
-  }
-}
-
-void multiple_tickets_iteration (int one_ticket[], int two_tickets[], int time) {
-  for (int i = 1; i < time; i++) {
-    if (one_ticket[i] != -1) {
-      for (int j = 0; j < tickets.size(); j++) {
-        if (i + duration_of_ticket(j) < time) {
-          if (two_tickets[duration_of_ticket(j) + i] == -1) {
-            two_tickets[duration_of_ticket(j) + i] = j;
-          }
-          else {
-            if(prize_of_ticket(two_tickets[duration_of_ticket(j) + i]) >= prize_of_ticket(j)) {
-              two_tickets[duration_of_ticket(j) + i] = j;
-            }
-          }
-        }
-        else {
-          // TO DO: zaimplementować, co jeśli wychodzi poza zakres doby.
-        }
+    for(int j = 0; j < tickets.size(); j++) {
+      for(int k = 0; k < tickets.size(); k++) {
+        id_st = i, id_nd = j, id_rd = k;
+        change(best_val, duration, st, nd, rd, i, none, none);
+        change(best_val, duration, st, nd, rd, i, j, none);
+        change(best_val, duration, st, nd, rd, i, j, k);
       }
     }
   }
-}
+  create_output(st, nd, rd);  
+} 
 
-std::pair<std::string, double> one_ticket_value(int one_ticket[], int time, int duration) {
-  double best_val = MAX_INT;
-  int start_point = 0;
-  for (int i = duration; i < time; i++) {
-    if(one_ticket[i] > -1) {
-      if(best_val > prize_of_ticket(one_ticket[i])) {
-        best_val = prize_of_ticket(one_ticket[i]);
-        start_point = i; 
-      }
-    }
-  }
-  if (best_val == MAX_INT) {
-    return std::make_pair(":-|\n", best_val);
-  }
-  std::string solution = "! " + name_of_ticket(one_ticket[start_point]) + "\n"; 
-  return std::make_pair(solution, best_val);
-}
-
-std::pair<std::string, double> two_ticket_value (int one_ticket[], int two_tickets[], int time, int duration) {
-  double best_val = MAX_INT;
-  int start_point = 0;
-  for (int i = duration; i < time; i++) {
-    if (two_tickets[i] > -1) {
-      int id_st = two_tickets[i];
-      int id_nd = one_ticket[i - duration_of_ticket(id_st)];
-      if (best_val > prize_of_ticket(id_st) + prize_of_ticket(id_nd)) {
-        start_point = i;
-        best_val = prize_of_ticket(id_st) + prize_of_ticket(id_nd);
-      }
-    }
-  }
-  if (best_val == MAX_INT) {
-    return std::make_pair(":-|\n", best_val);
-  }
-  int id_st = two_tickets[start_point];
-  int id_nd = one_ticket[start_point - duration_of_ticket(id_st)];
-  std::string solution = "! " + name_of_ticket(id_st) + "; " + name_of_ticket(id_nd) + "\n";
-  return std::make_pair(solution, best_val);  
-}
-
-std::pair<std::string, double> three_ticket_value (int one_ticket[], int two_tickets[], int three_tickets[], int time, int duration) {
-  double best_val = MAX_INT;
-  int start_point = 0;
-  for (int i = duration; i < time; i++) {
-    if (three_tickets[i] > -1) {
-      int id_st = three_tickets[i];
-      int id_nd = two_tickets[i - duration_of_ticket(id_st)];
-      int id_rd = one_ticket[i - duration_of_ticket(id_st) - duration_of_ticket(id_nd)];
-      if(best_val > prize_of_ticket(id_st) + prize_of_ticket(id_nd) + prize_of_ticket(id_rd)) {
-        start_point = i;
-        best_val = prize_of_ticket(id_st) + prize_of_ticket(id_nd) + prize_of_ticket(id_rd);
-      }
-    }
-  }
-  if(best_val == MAX_INT) {
-    return std::make_pair(":-|\n", best_val); 
-  }
-  int id_st = three_tickets[start_point];
-  int id_nd = two_tickets[start_point - duration_of_ticket(id_st)];
-  int id_rd = one_ticket[start_point - duration_of_ticket(id_st) - duration_of_ticket(id_nd)];
-  std::string solution = "! " + name_of_ticket(id_st) + "; " + name_of_ticket(id_nd) + "; " + name_of_ticket(id_rd) + "\n";
-  return std::make_pair(solution, best_val);
-}
-
-void calculate_solution (int one_ticket[], int two_tickets[], int three_tickets[], int time, int duration) {
-  std::pair<std::string, double> solutions[3];
-  solutions[0] = one_ticket_value(one_ticket, time, duration);
-  solutions[1] = two_ticket_value(one_ticket, two_tickets, time, duration);
-  solutions[2] = three_ticket_value(one_ticket, two_tickets, three_tickets, time, duration);
-
-  if (solutions[0].second > solutions[1].second) {
-    std::swap (solutions[0], solutions[1]);
-  }
-  if(solutions[0].second > solutions[2].second) {
-    std::swap(solutions[0], solutions[2]);
-  }
-
-  std::cout << solutions[0].first;
-}
-
-void knapsack_algorithm (int duration) {
-
-  int time = time_to_minutes(21, 21) - time_to_minutes(5, 55) + 1;
-  int size = time+2;
-  int one_ticket[size], two_tickets[size], three_tickets[size];
-  
-  set_array_to(-1, size, one_ticket);
-  set_array_to(-1, size, two_tickets);
-  set_array_to(-1, size, three_tickets);
-
-  one_ticket_iteration(one_ticket, time);
-  multiple_tickets_iteration(one_ticket, two_tickets, time);
-  multiple_tickets_iteration(two_tickets, three_tickets, time);
-
-  calculate_solution(one_ticket, two_tickets, three_tickets, time, duration);
-
+void find_best_combination (const int duration) {
+  create_solution(duration);
 }
 
 /* FUNKCJE DO TESTOWANIA */
 
 void testuj_algorytm_plecakowy () {
-  
   add_ticket("Trwanie 2", 2, 1);
   add_ticket("Trwanie 3", 3, 2);
   add_ticket("Tanie trwanie 2", 2, 0.4);
-  // print_all_the_tickets();
 
-  knapsack_algorithm(1);
-  knapsack_algorithm(2);
-  knapsack_algorithm(3);
-  knapsack_algorithm(5);
-  knapsack_algorithm(10);
-
+  find_best_combination(2);
+  find_best_combination(3);
+  find_best_combination(5);
+  find_best_combination(10);
 }
 
 void execute_line(int line_number, std::string line) {
@@ -347,7 +275,6 @@ void execute_line(int line_number, std::string line) {
 
 int main() {
   testuj_algorytm_plecakowy();
-
   std::string line;
 	int line_number = 1;
 
