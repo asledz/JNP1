@@ -267,15 +267,11 @@ void execute_ticket_adding(std::string &line, int line_number) {
 	std::cout << "ticket_regex\n";
 
 	std::string ticket_name, ticket_prize, ticket_valid;
-
 	ticket_name = first_match(line, ticket_name_regex);
-	std::cout << ticket_name << "\n";
-
 	ticket_prize = first_match(line, ticket_prize_regex);
-	std::cout << ticket_prize << "\n";
-
 	ticket_valid = first_match(line, ticket_valid_regex);
-	std::cout << ticket_valid << "\n";
+  
+  add_ticket(ticket_name, ticket_valid, ticket_prize);
 }
 
 void execute_course_query(std::string &line, int line_number) {
