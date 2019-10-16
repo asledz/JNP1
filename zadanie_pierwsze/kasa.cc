@@ -8,8 +8,8 @@
 
 #include <iostream>
 #include <vector>
-#include <map>
-#include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <regex>
 
@@ -45,11 +45,10 @@ void set_array_to(int value, int size, int tab[]) {
     }
 }
 
-// Funkcja konwertująca string do liczby zmiennoprzecinkowej
-// o rozwinięciu dziesiętnym długosci 2
-double string_to_double(std::string &text) {
-    double power = 0.01;
-    double result = 0;
+// Funkcja konwertująca string do liczby całkowitej
+int string_to_int(std::string &text) {
+    int power = 1;
+    int result = 0;
     for (int i = text.size() - 1; i >= 0; i--) {
         if (text[i] == '.') continue;
         result += power * char_to_int(text[i]);
@@ -58,35 +57,27 @@ double string_to_double(std::string &text) {
     return result;
 }
 
-// Funkcja konwertująca string do liczby całkowitej
-int string_to_int(std::string &text) {
-    int power = 1;
-    int result = 0;
-    for (int i = text.size() - 1; i >= 0; i--) {
-        result += power * char_to_int(text[i]);
-        power *= 10;
-    }
-    return result;
-}
-
+// Wypisuje na standardowe wyjście diagnostyczne informację o błędzie
+// w podanej linii oraz podaną linię
 void call_error(int line_number, std::string &line) {
     std::cerr << "Error in line " << line_number << ": " << line << "\n";
 }
 
+
 /* Funkcje obsługi rozkładu jazdy */
 
 // Skalowanie numerów linii
-std::map<int, int> line_id;
+std::unordered_map<int, int> line_id;
 
 // Liczba kursów tramwajowych
 unsigned number_of_courses;
 
 // Przechowywanie linii tramwajowych
 // Dla każdej linii(kursu) trzymamy godzinę przyjazdu na przystanek
-std::vector<std::map<std::string, int>> timetable;
+std::vector<std::unordered_map<std::string, int>> timetable;
 
-// Opis biletu - dla każdej nazwy trzymamy długość trwania, cenę
-std::vector<std::pair<std::string, std::pair<double, int>>> tickets;
+// Opis biletu - dla każdej nazwy trzymamy cenę i czas ważności
+std::vector<std::pair<std::string, std::pair<unsigned, int>>> tickets;
 
 // Sprawdza, czy dany numer linii kursu tramwajowego zatrzymuje się o danej godzinie na przystanku.
 bool stop_exists(int number_of_the_line, std::string name_of_the_stop, int time) {
@@ -102,6 +93,13 @@ bool stop_exists(int number_of_the_line, std::string name_of_the_stop, int time)
     }
 }
 
+// Funkcja sprawdzająca czy podany czas dojazdu na przystanek mieści
+// się w przedziale (bottom_limit, koniec pracy tramwajów]
+bool valid_minutes(unsigned bottom_limit, unsigned minutes) {
+  unsigned time_limit_up = string_to_time("21:21");
+  return bottom_limit < minutes && minutes <= time_limit_up;
+}
+
 /* Funkcje obługi biletów */
 
 std::string name_of_ticket(int id) {
@@ -115,11 +113,11 @@ bool check_if_exists(std::string name) {
     return false;
 }
 
-void add_ticket(std::string name, int duration, double prize) {
-    tickets.push_back((std::make_pair(name, std::make_pair(prize, duration))));
+void add_ticket(std::string name, int duration, unsigned price) {
+    tickets.push_back((std::make_pair(name, std::make_pair(price, duration))));
 }
 
-double prize_of_ticket(int id) {
+unsigned price_of_ticket(int id) {
     return tickets[id].second.first;
 }
 
@@ -150,18 +148,18 @@ void create_output(const int id_st, const int id_nd, const int id_rd) {
     }
 }
 
-double calculate_cost(const int id_st, const int id_nd, const int id_rd) {
-    double prize = MAX_INT;
+unsigned calculate_cost(const int id_st, const int id_nd, const int id_rd) {
+    unsigned price = MAX_INT;
     if (id_st != -1) {
-        prize = prize_of_ticket(id_st);
+        price = price_of_ticket(id_st);
     }
     if (id_nd != -1) {
-        prize += prize_of_ticket(id_nd);
+        price += price_of_ticket(id_nd);
     }
     if (id_rd != -1) {
-        prize += prize_of_ticket(id_rd);
+        price += price_of_ticket(id_rd);
     }
-    return prize;
+    return price;
 }
 
 int calculate_time(const int id_st, const int id_nd, const int id_rd) {
@@ -178,7 +176,7 @@ int calculate_time(const int id_st, const int id_nd, const int id_rd) {
     return time;
 }
 
-void change(double &value, const int time, int &st, int &nd, int &rd, int ticket_st, int ticket_nd, int ticket_rd) {
+void change(unsigned &value, const int time, int &st, int &nd, int &rd, int ticket_st, int ticket_nd, int ticket_rd) {
     if (calculate_cost(ticket_st, ticket_nd, ticket_rd) <= value) {
         if (calculate_time(ticket_st, ticket_nd, ticket_rd) >= time) {
             st = ticket_st;
@@ -191,7 +189,7 @@ void change(double &value, const int time, int &st, int &nd, int &rd, int ticket
 
 void create_solution(const int duration) {
     int none = -1;
-    double best_val = MAX_INT;
+    unsigned best_val = MAX_INT;
     int st = none, nd = none, rd = none;
     for (uint i = 0; i < tickets.size(); i++) {
         for (uint j = 0; j < tickets.size(); j++) {
@@ -210,39 +208,41 @@ void find_best_combination(const int duration) {
 }
 
 void execute_course_adding(std::string &line, int line_number) {
-    std::string line_backup = line;
-
     std::regex course_number_regex("^([0-9]+)");
     std::regex time_regex("((?:2[0-3]|1[0-9]|[1-9]):[0-5][0-9])");
     std::regex stop_name_regex("([a-zA-Z0-9^]+)");
-
-    std::string course_number, time_jprdl, stop_name;
+    std::string course_number, time_arriving, stop_name;
+    std::string line_backup = line;
 
     course_number = first_match(line, course_number_regex);
     unsigned course = string_to_int(course_number);
-    if (line_id.find(course) != line_id.end()) {
+
+    if (line_id.count(course)) {
         call_error(line_number, line_backup);
         return;
     }
+
     line_id[course] = number_of_courses;
 
-    std::map<std::string, int> course_timetable;
-    std::set<std::string> visited_stops;
-    int time_limit_bottom = string_to_time("5:55") - 1;
-    int time_limit_up = string_to_time("21:21");
+    std::unordered_map<std::string, int> course_timetable;
+    std::unordered_set<std::string> visited_stops;
+    unsigned time_limit_bottom = string_to_time("5:55") - 1;
+    unsigned minutes;
 
     while (!line.empty()) {
-        time_jprdl = first_match(line, time_regex);
-        int minutes = string_to_time(time_jprdl);
-        if (time_limit_bottom >= minutes || time_limit_up < minutes) {
+        time_arriving = first_match(line, time_regex);
+        minutes = string_to_time(time_arriving);
+
+        if (!valid_minutes(time_limit_bottom, minutes)) {
             line_id.erase(course);
             call_error(line_number, line_backup);
             return;
         }
+
         time_limit_bottom = minutes;
 
         stop_name = first_match(line, stop_name_regex);
-        if (visited_stops.find(stop_name) != visited_stops.end()) {
+        if (visited_stops.count(stop_name)) {
             line_id.erase(course);
             call_error(line_number, line_backup);
             return;
@@ -256,18 +256,18 @@ void execute_course_adding(std::string &line, int line_number) {
 }
 
 void execute_ticket_adding(std::string &line, int line_number) {
+    std::regex ticket_name_regex("((?:[a-zA-Z ])+)");
+    std::regex ticket_price_regex("((?:[0-9])+\\.[0-9]{2})");
+    std::regex ticket_valid_regex("([1-9][0-9]*)");
+    std::string ticket_name, ticket_price, ticket_valid;
     std::string line_backup = line;
 
-    std::regex ticket_name_regex("((?:[a-zA-Z ])+)");
-    std::regex ticket_prize_regex("((?:[0-9])+\\.[0-9]{2})");
-    std::regex ticket_valid_regex("([1-9][0-9]*)");
-
-    std::string ticket_name, ticket_prize, ticket_valid;
     ticket_name = first_match(line, ticket_name_regex);
     ticket_name.erase(ticket_name.size() - 1, ticket_name.size());
-    ticket_prize = first_match(line, ticket_prize_regex);
-    double price_int = string_to_double(ticket_prize);
+    ticket_price = first_match(line, ticket_price_regex);
     ticket_valid = first_match(line, ticket_valid_regex);
+
+    int price_int = string_to_int(ticket_price);
     int valid_time = string_to_int(ticket_valid);
 
     if (check_if_exists(ticket_name)) {
@@ -279,23 +279,21 @@ void execute_ticket_adding(std::string &line, int line_number) {
 }
 
 void execute_course_query(std::string &line, int line_number) {
-    std::string line_backup = line;
-
     std::regex stop_name_regex("([a-zA-Z0-9^]+)");
     std::regex course_number_regex("([0-9]+)");
-
     std::string start, stop, course_number;
+    std::string line_backup = line;
 
     start = first_match(line, stop_name_regex);
 
     course_number = first_match(line, course_number_regex);
     stop = first_match(line, stop_name_regex);
-    int course_number_int = string_to_int(course_number);
-    int start_time, last_time;
+    unsigned course_number_int = string_to_int(course_number);
+    unsigned start_time, last_time;
 
-    if (timetable[line_id[course_number_int]].find(start) != timetable[line_id[course_number_int]].end()) {
+    if (timetable[line_id[course_number_int]].count(start)) {
         start_time = timetable[line_id[course_number_int]][start];
-        if (timetable[line_id[course_number_int]].find(stop) != timetable[line_id[course_number_int]].end()) {
+        if (timetable[line_id[course_number_int]].count(stop)) {
             last_time = timetable[line_id[course_number_int]][stop];
         } else {
             call_error(line_number, line_backup);
@@ -314,13 +312,14 @@ void execute_course_query(std::string &line, int line_number) {
 
         stop = first_match(line, stop_name_regex);
 
-        if (timetable[line_id[course_number_int]].find(start) != timetable[line_id[course_number_int]].end() &&
-            timetable[line_id[course_number_int]].find(stop) != timetable[line_id[course_number_int]].end()) {
-            if (last_time == timetable[line_id[course_number_int]][start]) {
+        if (timetable[line_id[course_number_int]].count(start) &&
+            timetable[line_id[course_number_int]].count(stop)) {
+            unsigned on_start = timetable[line_id[course_number_int]][start];
+            if (last_time == on_start) {
                 last_time = timetable[line_id[course_number_int]][stop];
                 start = stop;
             } else {
-                if (last_time > timetable[line_id[course_number_int]][start]) {
+                if (last_time > on_start) {
                     call_error(line_number, line_backup);
                     return;
                 }
@@ -335,7 +334,7 @@ void execute_course_query(std::string &line, int line_number) {
     find_best_combination(last_time - start_time + 1);
 }
 
-void execute_line(int line_number, std::string line) {
+void execute_line(int line_number, std::string &line) {
     std::regex course_regex("^([0-9]+)((?: (?:(?:2[0-3]|1[0-9]|[1-9]):[0-5][0-9]) (?:[a-zA-Z0-9^]+)){2,})$");
     std::regex ticket_regex("^((?:[a-zA-Z ])+) ((?:[0-9])+\\.[0-9]{2}) ([1-9][0-9]*)$");
     std::regex query_regex("^\\? (?:[a-zA-Z0-9^]+)( (?:[0-9]+) (?:[a-zA-Z0-9^]+))+$");
