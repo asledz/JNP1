@@ -17,36 +17,36 @@
 
 const int MAX_INT = 2147483647;
 
-int char_to_int(char num) {
+uint char_to_int(const char num) {
     return num - '0';
 }
 
-int time_to_minutes(int hour, int minutes) {
+uint time_to_minutes(const int hour, const int minutes) {
     return 60 * hour + minutes;
 }
 
 // Funkcja konwertująca string z opisem godziny do minut.
-// W przypadku niepoprawnej godziny, zwraca -1.
-int string_to_time(std::string time) {
+// W przypadku niepoprawnej godziny, zwraca -1. Godzina jest podana w formacie hh:mm albo h:mm.
+int string_to_time(const std::string time) {
     if (time.size() < 4 || time.size() > 5) {
         return -1;
     }
-    int minutes = char_to_int(time[time.size() - 1]) + 10 * char_to_int(time[time.size() - 2]);
-    int hours = char_to_int(time[0]);
+    uint minutes = char_to_int(time[time.size() - 1]) + 10 * char_to_int(time[time.size() - 2]);
+    uint hours = char_to_int(time[0]);
     if (time[1] != ':') {
         hours = hours * 10 + char_to_int(time[1]);
     }
     return time_to_minutes(hours, minutes);
 }
 
-void set_array_to(int value, int size, int tab[]) {
-    for (int i = 0; i < size; i++) {
+void set_array_to(const int value, const uint size, int tab[]) {
+    for (uint i = 0; i < size; i++) {
         tab[i] = value;
     }
 }
 
 // Funkcja konwertująca string do liczby całkowitej
-int string_to_int(std::string &text) {
+int string_to_int(const std::string &text) {
     int power = 1;
     int result = 0;
     for (int i = text.size() - 1; i >= 0; i--) {
@@ -58,11 +58,10 @@ int string_to_int(std::string &text) {
 }
 
 // Wypisuje na standardowe wyjście diagnostyczne informację o błędzie
-// w podanej linii oraz podaną linię
-void call_error(int line_number, std::string &line) {
+// w podanej linii oraz podaną linię.
+void call_error(const int line_number, std::string &line) {
     std::cerr << "Error in line " << line_number << ": " << line << "\n";
 }
-
 
 /* Funkcje obsługi rozkładu jazdy */
 
@@ -78,6 +77,8 @@ std::vector<std::unordered_map<std::string, int>> timetable;
 
 // Opis biletu - dla każdej nazwy trzymamy cenę i czas ważności
 std::vector<std::pair<std::string, std::pair<unsigned, int>>> tickets;
+
+long long sold_tickets;
 
 // Sprawdza, czy dany numer linii kursu tramwajowego zatrzymuje się o danej godzinie na przystanku.
 bool stop_exists(int number_of_the_line, std::string name_of_the_stop, int time) {
@@ -102,27 +103,27 @@ bool valid_minutes(unsigned bottom_limit, unsigned minutes) {
 
 /* Funkcje obługi biletów */
 
-std::string name_of_ticket(int id) {
+void add_ticket(std::string name, const int duration, unsigned price) {
+    tickets.push_back((std::make_pair(name, std::make_pair(price, duration))));
+}
+
+unsigned price_of_ticket(const int id) {
+    return tickets[id].second.first;
+}
+
+int duration_of_ticket(const int id) {
+    return tickets[id].second.second;
+}
+
+std::string name_of_ticket(const int id) {
     return tickets[id].first;
 }
 
-bool check_if_exists(std::string name) {
+bool check_if_exists(const std::string name) {
     for (uint i = 0; i < tickets.size(); i++) {
         if (name_of_ticket(i) == name) return true;
     }
     return false;
-}
-
-void add_ticket(std::string name, int duration, unsigned price) {
-    tickets.push_back((std::make_pair(name, std::make_pair(price, duration))));
-}
-
-unsigned price_of_ticket(int id) {
-    return tickets[id].second.first;
-}
-
-int duration_of_ticket(int id) {
-    return tickets[id].second.second;
 }
 
 std::string first_match(std::string &text, std::regex &r) {
@@ -140,11 +141,14 @@ void create_output(const int id_st, const int id_nd, const int id_rd) {
         std::cout << ":-|\n";
     } else if (id_nd == -1) {
         std::cout << "! " << name_of_ticket(id_st) << "\n";
+        sold_tickets += 1;
     } else if (id_rd == -1) {
         std::cout << "! " << name_of_ticket(id_st) << "; " << name_of_ticket(id_nd) << "\n";
+        sold_tickets += 2;
     } else {
         std::cout << "! " << name_of_ticket(id_st) << "; " << name_of_ticket(id_nd) << "; " << name_of_ticket(id_rd)
                   << "\n";
+        sold_tickets += 3;
     }
 }
 
@@ -361,6 +365,8 @@ int main() {
     while (std::getline(std::cin, line)) {
         execute_line(line_number++, line);
     }
+
+    std::cout << sold_tickets << "\n";
 
     return 0;
 }
