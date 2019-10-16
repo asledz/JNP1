@@ -69,7 +69,7 @@ int string_to_int(std::string &text) {
     return result;
 }
 
-void callError(int line_number, std::string &line) {
+void call_error(int line_number, std::string &line) {
     std::cerr << "Error in line " << line_number << ": " << line << "\n";
 }
 
@@ -221,7 +221,7 @@ void execute_course_adding(std::string &line, int line_number) {
     course_number = first_match(line, course_number_regex);
     unsigned course = string_to_int(course_number);
     if (line_id.find(course) != line_id.end()) {
-        callError(line_number, line_backup);
+        call_error(line_number, line_backup);
         return;
     }
     line_id[course] = number_of_courses;
@@ -236,7 +236,7 @@ void execute_course_adding(std::string &line, int line_number) {
         int minutes = string_to_time(time_jprdl);
         if (time_limit_bottom >= minutes || time_limit_up < minutes) {
             line_id.erase(course);
-            callError(line_number, line_backup);
+            call_error(line_number, line_backup);
             return;
         }
         time_limit_bottom = minutes;
@@ -244,7 +244,7 @@ void execute_course_adding(std::string &line, int line_number) {
         stop_name = first_match(line, stop_name_regex);
         if (visited_stops.find(stop_name) != visited_stops.end()) {
             line_id.erase(course);
-            callError(line_number, line_backup);
+            call_error(line_number, line_backup);
             return;
         }
 
@@ -271,7 +271,7 @@ void execute_ticket_adding(std::string &line, int line_number) {
     int valid_time = string_to_int(ticket_valid);
 
     if (check_if_exists(ticket_name)) {
-        callError(line_number, line_backup);
+        call_error(line_number, line_backup);
         return;
     }
 
@@ -298,11 +298,11 @@ void execute_course_query(std::string &line, int line_number) {
         if (timetable[line_id[course_number_int]].find(stop) != timetable[line_id[course_number_int]].end()) {
             last_time = timetable[line_id[course_number_int]][stop];
         } else {
-            callError(line_number, line_backup);
+            call_error(line_number, line_backup);
             return;
         }
     } else {
-        callError(line_number, line_backup);
+        call_error(line_number, line_backup);
         return;
     }
 
@@ -321,14 +321,14 @@ void execute_course_query(std::string &line, int line_number) {
                 start = stop;
             } else {
                 if (last_time > timetable[line_id[course_number_int]][start]) {
-                    callError(line_number, line_backup);
+                    call_error(line_number, line_backup);
                     return;
                 }
                 std::cout << ":( " << start << "\n";
                 return;
             }
         } else {
-            callError(line_number, line_backup);
+            call_error(line_number, line_backup);
             return;
         }
     }
@@ -349,7 +349,7 @@ void execute_line(int line_number, std::string line) {
     } else if (std::regex_match(line, query_regex)) {
         execute_course_query(line, line_number);
     } else {
-        callError(line_number, line);
+        call_error(line_number, line);
         return;
     }
 
