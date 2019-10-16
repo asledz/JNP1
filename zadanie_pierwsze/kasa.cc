@@ -69,6 +69,10 @@ int string_to_int (std::string &text) {
 	return result;
 }
 
+void callError(int line_number, std::string &line) {
+	std::cerr << "Error in line " << line_number << ": " << line << "\n";
+}
+
 /* Funkcje obsługi rozkładu jazdy */
 
 // Skalowanie numerów linii
@@ -216,38 +220,46 @@ void testuj_algorytm_plecakowy () {
   find_best_combination(10);
 }
 
-void execute_course_adding(std::string line, int line_number) {
+void execute_course_adding(std::string &line, int line_number) {
+	std::string line_backup = line;
+
 	std::regex course_number_regex("^([0-9]+)");
 	std::regex time_regex("((?:2[0-3]|1[0-9]|[1-9]):[0-5][0-9])");
 	std::regex stop_name_regex("([a-zA-Z0-9^]+)");
 
-	std::cout << "course_regex\n";
 	std::string course_number, time_jprdl, course_name;
 
 	course_number = first_match(line, course_number_regex);
-	std::cout << course_number << "\n";
-
 	unsigned course = string_to_int(course_number);
 	line_id[course] = number_of_courses;
 
-	map<std::string, int> course_timetable;
+	std::map<std::string, int> course_timetable;
+	std::set<std::string> visited_stops;
 	int time_check = -1;
+
 	while(!line.empty()) {
 		time_jprdl = first_match(line, time_regex);
-		minutes = time_to_minutes(time_jprdl);
+		int minutes = string_to_time(time_jprdl);
 		if(time_check >= minutes) {
-			number_of_courses--;
 			line_id.erase(number_of_courses);
-
+			callError(line_number, line_backup);
 		}
-		std::cout << time_jprdl << "\n";
+		time_check = minutes;
 
 		course_name = first_match(line, stop_name_regex);
-		std::cout << course_name << "\n";
+		if(visited_stops.find(course_name) != visited_stops.end()) {
+			line_id.erase(number_of_courses);
+			callError(line_number, line_backup);
+		}
+
+		course_timetable[course_name] = minutes;
 	}
+	number_of_courses++;
+	timetable.push_back(course_timetable);
+
 }
 
-void execute_ticket_adding(std::string line, int line_number) {
+void execute_ticket_adding(std::string &line, int line_number) {
 	std::regex ticket_name_regex("((?:[a-zA-Z ])+)");
   std::regex ticket_prize_regex("((?:[0-9])+\\.[0-9]{2})");
   std::regex ticket_valid_regex("([1-9][0-9]*)");
@@ -266,7 +278,7 @@ void execute_ticket_adding(std::string line, int line_number) {
 	std::cout << ticket_valid << "\n";
 }
 
-void execute_course_query(std::string line, int line_number) {
+void execute_course_query(std::string &line, int line_number) {
 	std::regex stop_name_regex("([a-zA-Z0-9^]+)");
 	std::regex course_number_regex("([0-9]+)");
 
@@ -291,7 +303,10 @@ void execute_line(int line_number, std::string line) {
   std::regex ticket_regex("^((?:[a-zA-Z ])+) ((?:[0-9])+\\.[0-9]{2}) ([1-9][0-9]*)$");
   std::regex query_regex("^\\? (?:[a-zA-Z0-9^]+)( (?:[0-9]+) (?:[a-zA-Z0-9^]+))+$");
 
-  if(std::regex_match(line, course_regex)) {
+	if(line.empty()) {
+		return;
+	}
+  else if(std::regex_match(line, course_regex)) {
 		execute_course_adding(line, line_number);
   }
   else if(std::regex_match(line, ticket_regex)) {
@@ -300,6 +315,10 @@ void execute_line(int line_number, std::string line) {
   else if(std::regex_match(line, query_regex)) {
     execute_course_query(line, line_number);
   }
+	else {
+		callError(line_number, line);
+	}
+
 }
 
 int main() {
