@@ -43,6 +43,7 @@ void set_array_to(int value, int size, int tab[]) {
   for(int i = 0; i < size; i++) {
     tab[i] = value;
   }
+}
 
 // Funkcja konwertująca string do liczby zmiennoprzecinkowej
 // o rozwinięciu dziesiętnym długosci 2
@@ -270,6 +271,7 @@ void knapsack_algorithm (int duration) {
 /* FUNKCJE DO TESTOWANIA */
 
 void testuj_algorytm_plecakowy () {
+  
   add_ticket("Trwanie 2", 2, 1);
   add_ticket("Trwanie 3", 3, 2);
   add_ticket("Tanie trwanie 2", 2, 0.4);
@@ -280,6 +282,7 @@ void testuj_algorytm_plecakowy () {
   knapsack_algorithm(3);
   knapsack_algorithm(5);
   knapsack_algorithm(10);
+
 }
 
 void execute_line(int line_number, std::string line) {
@@ -343,6 +346,8 @@ void execute_line(int line_number, std::string line) {
 }
 
 int main() {
+  testuj_algorytm_plecakowy();
+
   std::string line;
 	int line_number = 1;
 
