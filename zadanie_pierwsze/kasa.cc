@@ -363,11 +363,12 @@ void execute_course_query(std::string &line, int line_number) {
         if (timetable[line_id[course_number_int]].count(start) &&
             timetable[line_id[course_number_int]].count(stop)) {
             unsigned on_start = timetable[line_id[course_number_int]][start];
-            if (last_time == on_start) {
-                last_time = timetable[line_id[course_number_int]][stop];
+            unsigned on_stop = timetable[line_id[course_number_int]][stop];
+            if (last_time == on_start && on_start < on_stop) {
+                last_time = on_stop;
                 start = stop;
             } else {
-                if (last_time > on_start) {
+                if (last_time >= on_start) {
                     call_error(line_number, line_backup);
                     return;
                 }
