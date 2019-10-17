@@ -26,11 +26,8 @@ uint time_to_minutes(const int hour, const int minutes) {
 }
 
 // Funkcja konwertująca string z opisem godziny do minut.
-// W przypadku niepoprawnej godziny, zwraca -1. Godzina jest podana w formacie hh:mm albo h:mm.
+// Godzina jest podana w formacie hh:mm albo h:mm.
 int string_to_time(const std::string &time) {
-    if (time.size() < 4 || time.size() > 5) {
-        return -1;
-    }
     uint minutes = char_to_int(time[time.size() - 1]) + 10 * char_to_int(time[time.size() - 2]);
     uint hours = char_to_int(time[0]);
     if (time[1] != ':') {
@@ -46,9 +43,12 @@ void set_array_to(const int value, const uint size, int tab[]) {
 }
 
 // Funkcja konwertująca string do liczby całkowitej
-int string_to_int(const std::string &text) {
-    int power = 1;
-    int result = 0;
+// Ignoruje napotkane kropki - liczby zmiennoprzecinkowe traktuje jak całkowite
+// Argument text musi być poprawną liczbą całkowitą lub zmiennoprzecinkową
+// zapisaną jako tekst
+unsigned long long string_to_ull(const std::string &text) {
+    unsigned long long power = 1;
+    unsigned long long result = 0;
     for (int i = text.size() - 1; i >= 0; i--) {
         if (text[i] == '.') continue;
         result += power * char_to_int(text[i]);
@@ -126,6 +126,9 @@ bool check_if_exists(const std::string name) {
     return false;
 }
 
+// Funkcja dla podanego tekstu i wzorca znajduje pierwsze wystąpienie
+// wzorca w tekscie, zwraca je oraz modfikuje tekst w taki sposób, że
+// po jej wywołaniu jest on swoim sufiksem zaczynającym się za wystąpieniem wzorca
 std::string first_match(std::string &text, std::regex &r) {
     std::smatch match;
     std::regex_search(text, match, r);
@@ -211,6 +214,9 @@ void find_best_combination(const int duration) {
     create_solution(duration);
 }
 
+// Rozpatruje linię z komendą dodania kursu, w razie błądu w komendzie
+// wywołuje funkcję call_error, jeśli komenda jest poprawna dodaje rozkład
+// kursu do wektora i mapuje jego numer.
 void execute_course_adding(std::string &line, int line_number) {
     std::regex course_number_regex("^([0-9]+)");
     std::regex time_regex("((?:2[0-3]|1[0-9]|[1-9]):[0-5][0-9])");
@@ -219,20 +225,27 @@ void execute_course_adding(std::string &line, int line_number) {
     std::string line_backup = line;
 
     course_number = first_match(line, course_number_regex);
-    unsigned course = string_to_int(course_number);
+    unsigned course = string_to_ull(course_number);
 
     if (line_id.count(course)) {
         call_error(line_number, line_backup);
         return;
     }
 
+    // Mapowanie numeru kursu
     line_id[course] = number_of_courses;
 
     std::unordered_map<std::string, unsigned> course_timetable;
+    // Set do wychwycenia powtórzeń w trasie kursu
     std::unordered_set<std::string> visited_stops;
     unsigned time_limit_bottom = string_to_time("5:55") - 1;
     unsigned minutes;
 
+    // Kolejne czasy oraz przystanki są ucinane z początku komendy aż do jej
+    // zakończenia. W przypadku powtórzenia nazwy przystanku lub wczytania
+    // niepoprawnego czasu (przed poprzednim przystankiem/rozpoczęciem pracy
+    // lub po zakończeniu pracy), wywołuję call_error i cofam mapowanie
+    // numeru kursu.
     while (!line.empty()) {
         time_arriving = first_match(line, time_regex);
         minutes = string_to_time(time_arriving);
@@ -255,10 +268,16 @@ void execute_course_adding(std::string &line, int line_number) {
         visited_stops.insert(stop_name);
         course_timetable[stop_name] = minutes;
     }
+    // Jeśli nie przerwano działania funkcji, to znaczy, że zapytanie jest
+    // poprawne, dodaję rozkład do wektora kursów i zwiększam licznik
+    // przechowywanych kursów.
     number_of_courses++;
     timetable.push_back(course_timetable);
 }
 
+// Rozpatruje linię z komendą dodania biletu, wywołuje funkcję
+// call_error jeśli któryś z paremetrów jest niepoprawny, jeśli są poprawne,
+// dodaje bilet do wektora biletów
 void execute_ticket_adding(std::string &line, int line_number) {
     std::regex ticket_name_regex("((?:[a-zA-Z ])+)");
     std::regex ticket_price_regex("((?:[0-9])+\\.[0-9]{2})");
@@ -271,17 +290,25 @@ void execute_ticket_adding(std::string &line, int line_number) {
     ticket_price = first_match(line, ticket_price_regex);
     ticket_valid = first_match(line, ticket_valid_regex);
 
-    int price_int = string_to_int(ticket_price);
-    int valid_time = string_to_int(ticket_valid);
+    int price_int = string_to_ull(ticket_price);
+    int valid_time = string_to_ull(ticket_valid);
 
     if (check_if_exists(ticket_name)) {
         call_error(line_number, line_backup);
         return;
     }
-
+    // Jeśli nie przerwano działania funkcji, to znaczy, że parametry są
+    // poprawne, dodaje bilet do wektora biletów.
     add_ticket(ticket_name, valid_time, price_int);
 }
 
+// Rozpatruje linię z komendą zapytania o trasę, wywołuje funkcję
+// call_error jeśli któryś z paremetrów jest niepoprawny,
+// lub jeśli nie da się przebyć tej trasy dodanymi kursami.
+// Odpowiada na pytanie jakimi biletami najtaniej można przejechać zadaną trasę,
+// wypisuje ":-( nazwa_przystanku", jeśli nie da się przebyć tej trasy bez
+// czekania lub wypisuje ":-|" jeśli dodane bilety nie wystarzczą na
+// przejechanie trasy
 void execute_course_query(std::string &line, int line_number) {
     std::regex stop_name_regex("([a-zA-Z_^]+)");
     std::regex course_number_regex("([0-9]+)");
@@ -292,9 +319,12 @@ void execute_course_query(std::string &line, int line_number) {
 
     course_number = first_match(line, course_number_regex);
     stop = first_match(line, stop_name_regex);
-    unsigned course_number_int = string_to_int(course_number);
+    unsigned course_number_int = string_to_ull(course_number);
     unsigned start_time, last_time;
 
+    // Pierwsze 2 przystanki są sprawdzane osobno - sprawdzam czy linia istnieje,
+    // czy podane przystanki należą do linii oraz czy następują po sobie w
+    // dobrej kolejności.
     if(!line_id.count(course_number_int)) {
       call_error(line_number, line_backup);
       return;
@@ -315,9 +345,14 @@ void execute_course_query(std::string &line, int line_number) {
 
     start = stop;
 
+    // Każdy kolejny przystanek jest "doklejany" do poprzednich:
+    // Sprawdzam czy podana linia istnieje, czy przystanek istnieje dla podanej
+    // linii, czy czas dojadu na przystanek nie jest mniejszy bądź równy
+    // czasowi z ostatniego przystanku oraz czy jest równy czasowi dojazdu
+    // poprzedniej linii na ten przystanek.
     while (!line.empty()) {
         course_number = first_match(line, course_number_regex);
-        course_number_int = string_to_int(course_number);
+        course_number_int = string_to_ull(course_number);
 
         stop = first_match(line, stop_name_regex);
 
@@ -336,7 +371,7 @@ void execute_course_query(std::string &line, int line_number) {
                     call_error(line_number, line_backup);
                     return;
                 }
-                std::cout << ":( " << start << "\n";
+                std::cout << ":-( " << start << "\n";
                 return;
             }
         } else {
@@ -344,9 +379,15 @@ void execute_course_query(std::string &line, int line_number) {
             return;
         }
     }
+    // Jeśli nie przerwano działania funkcji, to znaczy, że zapytanie jest
+    // poprawne i należy wyliczyć wynik dla policzonego czasu jazdy.
     find_best_combination(last_time - start_time + 1);
 }
 
+// Wyszukuje we wczytanej linii którejś z dostępnych komend, jeśli odnajdzie
+// dopasowanie, przekzuje linię odpowiedniej funkcji wywołującej.
+// Jeśli linia nie pasuje do żadnego wzorca, wywołuje funkcję call_error.
+// Ignoruje puste linie.
 void execute_line(int line_number, std::string &line) {
     std::regex course_regex("^([0-9]+)((?: (?:(?:2[0-3]|1[0-9]|[1-9]):[0-5][0-9]) (?:[a-zA-Z_^]+)){2,})$");
     std::regex ticket_regex("^((?:[a-zA-Z ])+) ((?:[0-9])+\\.[0-9]{2}) ([1-9][0-9]*)$");
@@ -367,6 +408,10 @@ void execute_line(int line_number, std::string &line) {
 
 }
 
+// Funkcja sterująca programem.
+// Wczytuje linie do napotkania końca pliku i przekazuje ich rozpatrzenie
+// funkcji execute_line. Na koniec działania programu
+// wypisuje liczbę kupionych biletów
 int main() {
     std::string line;
     int line_number = 1;
