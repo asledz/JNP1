@@ -13,7 +13,17 @@ Moduł obsługujący zbiory częściowo uporządkowane (ang. poset), których el
 Rozwiązanie znajduje się w folderze [zadanie_drugie](/zadanie_drugie).
 
 
-# Jak dodać rozwiązanie:
+# Obsługa svn:
+
+Dodawanie pliku do repo:
 ```
 svn import nazwa_pliku.cc https://svn.mimuw.edu.pl/repos/jnp1-students/grupa3/zadanienumer/folder/nazwa_pliku.cc -m "Dodano rozwiązanie"
+```
+Pobierabie repo(na przykład treści zadań): 
+```
+svn checkout https://svn.mimuw.edu.pl/repos/jnp1-students/common --username as406384
+```
+Update repo
+``` 
+svn update
 ```
