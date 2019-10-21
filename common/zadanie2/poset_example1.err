@@ -1,0 +1,113 @@
+poset_new()
+poset_new: poset 0 created
+poset_size(0)
+poset_size: poset 0 contains 0 element(s)
+poset_size(1)
+poset_size: poset 1 does not exist
+poset_insert(0, "NULL")
+poset_insert: invalid value (NULL)
+poset_insert(0, "A")
+poset_insert: poset 0, element "A" inserted
+poset_test(0, "A", "A")
+poset_test: poset 0, relation ("A", "A") exists 
+poset_insert(0, "A")
+poset_insert: poset 0, element "A" already exists
+poset_insert(1, "B")
+poset_insert: poset 1 does not exist
+poset_size(0)
+poset_size: poset 0 contains 1 element(s)
+poset_remove(1, "A")
+poset_remove: poset 1 does not exist
+poset_remove(0, "A")
+poset_remove: poset 0, element "A" removed
+poset_remove(0, "A")
+poset_remove: poset 0, element "A" does not exist
+poset_insert(0, "B")
+poset_insert: poset 0, element "B" inserted
+poset_insert(0, "C")
+poset_insert: poset 0, element "C" inserted
+poset_add(0, "B", "C")
+poset_add: poset 0, relation ("B", "C") added 
+poset_remove(0, "A")
+poset_remove: poset 0, element "A" does not exist
+poset_add(0, "NULL", "X")
+poset_add: invalid value1 (NULL)
+poset_del(0, "NULL", "X")
+poset_del: invalid value1 (NULL)
+poset_test(0, "NULL", "X")
+poset_test: invalid value1 (NULL)
+poset_add(0, "X", "NULL")
+poset_add: invalid value2 (NULL)
+poset_del(0, "X", "NULL")
+poset_del: invalid value2 (NULL)
+poset_test(0, "X", "NULL")
+poset_test: invalid value2 (NULL)
+poset_add(0, "NULL", "NULL")
+poset_add: invalid value1 (NULL)
+poset_add: invalid value2 (NULL)
+poset_del(0, "NULL", "NULL")
+poset_del: invalid value1 (NULL)
+poset_del: invalid value2 (NULL)
+poset_test(0, "NULL", "NULL")
+poset_test: invalid value1 (NULL)
+poset_test: invalid value2 (NULL)
+poset_add(0, "C", "D")
+poset_add: poset 0, element "C" or "D" does not exist
+poset_add(0, "D", "C")
+poset_add: poset 0, element "D" or "C" does not exist
+poset_del(0, "C", "D")
+poset_del: poset 0, element "C" or "D" does not exist
+poset_del(0, "D", "C")
+poset_del: poset 0, element "D" or "C" does not exist
+poset_test(0, "C", "D")
+poset_test: poset 0, element "C" or "D" does not exist
+poset_test(0, "D", "C")
+poset_test: poset 0, element "D" or "C" does not exist
+poset_add(1, "C", "D")
+poset_add: poset 1 does not exist
+poset_del(1, "C", "D")
+poset_del: poset 1 does not exist
+poset_test(1, "C", "D")
+poset_test: poset 1 does not exist
+poset_clear(0)
+poset_clear: poset 0 cleared
+poset_clear(1)
+poset_clear: poset 1 does not exist
+poset_insert(0, "E")
+poset_insert: poset 0, element "E" inserted
+poset_insert(0, "F")
+poset_insert: poset 0, element "F" inserted
+poset_insert(0, "G")
+poset_insert: poset 0, element "G" inserted
+poset_add(0, "E", "F")
+poset_add: poset 0, relation ("E", "F") added 
+poset_add(0, "E", "F")
+poset_add: poset 0, relation ("E", "F") cannot be added 
+poset_add(0, "F", "E")
+poset_add: poset 0, relation ("F", "E") cannot be added 
+poset_test(0, "E", "F")
+poset_test: poset 0, relation ("E", "F") exists 
+poset_test(0, "F", "E")
+poset_test: poset 0, relation ("F", "E") does not exist 
+poset_add(0, "F", "G")
+poset_add: poset 0, relation ("F", "G") added 
+poset_test(0, "E", "G")
+poset_test: poset 0, relation ("E", "G") exists 
+poset_del(0, "E", "G")
+poset_del: poset 0, relation ("E", "G") cannot be deleted 
+poset_del(0, "E", "F")
+poset_del: poset 0, relation ("E", "F") deleted 
+poset_del(0, "E", "F")
+poset_del: poset 0, relation ("E", "F") cannot be deleted 
+poset_del(0, "G", "F")
+poset_del: poset 0, relation ("G", "F") cannot be deleted 
+poset_del(0, "G", "G")
+poset_del: poset 0, relation ("G", "G") cannot be deleted 
+poset_size(0)
+poset_size: poset 0 contains 3 element(s)
+poset_delete(0)
+poset_delete: poset 0 deleted
+poset_delete(0)
+poset_delete: poset 0 does not exist
+poset_delete(1)
+poset_delete: poset 1 does not exist

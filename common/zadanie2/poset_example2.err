@@ -1,0 +1,16 @@
+poset_new()
+poset_new: poset 0 created
+poset_insert(0, "testowy1")
+poset_insert: poset 0, element "testowy1" inserted
+poset_insert(0, "testowy2")
+poset_insert: poset 0, element "testowy2" inserted
+poset_add(0, "testowy1", "testowy2")
+poset_add: poset 0, relation ("testowy1", "testowy2") added 
+poset_insert(0, "NULL")
+poset_insert: invalid value (NULL)
+poset_test(0, "testowy1", "testowy2")
+poset_test: poset 0, relation ("testowy1", "testowy2") exists 
+poset_test(0, "testowy2", "testowy1")
+poset_test: poset 0, relation ("testowy2", "testowy1") does not exist 
+poset_delete(0)
+poset_delete: poset 0 deleted
