@@ -2,7 +2,7 @@
 >Języki i narzędzia programowania 1, MIMUW
 
 ## Treści zadań
-Treści zadań znajdują się w [tutaj](/commons).
+Treści zadań znajdują się w [tutaj](/common).
 
 ## Zadanie 1.
 Program wspomagający pracę kasy biletowej. Używa rozwiązania sześciennego, aby znaleźć optymalny set biletów. Do obsługi wejścia używane są regexy.
