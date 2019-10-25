@@ -4,6 +4,7 @@
 #include <cstdio> 
 
 // Tworzy nowy poset i zwraca jego identyfikator.
+extern "C" unsigned long poset_new(void);
 unsigned long poset_new(void);
 
 // Jeżeli istnieje poset o identyfikatorze id, usuwa go, a w przeciwnym
