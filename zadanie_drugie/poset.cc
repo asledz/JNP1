@@ -17,22 +17,20 @@ const bool debug = false;
 const bool debug = true;
 #endif
 
-using namespace std;
-
 using id_type = unsigned long;
 
 int globalCounter = 0;
 
-vector <id_type> free_ids;
+std::vector <id_type> free_ids;
 
-map <id_type, map<string, set<string>>> graph;
-map <id_type, map<string, set<string>>> transposed_graph;
+std::map <id_type, std::map<std::string, std::set<std::string>>> graph;
+std::map <id_type, std::map<std::string, std::set<std::string>>> transposed_graph;
 
-map <id_type, size_t> poset_active_elements;
+std::map <id_type, size_t> poset_active_elements;
 
-map <id_type, map<string, bool>> element_exists;
+std::map <id_type, std::map<std::string, bool>> element_exists;
 
-map <id_type, bool> poset_exists;
+std::map <id_type, bool> poset_exists;
 
 id_type poset_new(void){
 	id_type newId;
@@ -76,9 +74,9 @@ size_t poset_size(id_type id){
 }
 
 // funkcja pomocnicza do skopiowania nazwy elementu
-string copyName(char const *value){
+std::string copyName(char const *value){
 	int i = 0;
-	string copiedName = "";
+	std::string copiedName = "";
 
 	while(value[i] != '\0'){
 		copiedName += value[i];
@@ -97,14 +95,14 @@ bool check_name(char const *value){
 	}
 }
 
-void add_relation(id_type id, string name1, string name2){
+void add_relation(id_type id, std::string name1, std::string name2){
 	graph[id][name1].insert(name2);
 	transposed_graph[id][name2].insert(name1);
 
 	return;
 }
 
-void delete_relation(id_type id, string name1, string name2){
+void delete_relation(id_type id, std::string name1, std::string name2){
 	auto it1 = graph[id][name1].find(name2);
 	graph[id][name1].erase(it1);
 
@@ -120,7 +118,7 @@ bool poset_insert(id_type id, char const *value){
 			return false;
 		}
 
-		string copiedName = copyName(value);
+		std::string copiedName = copyName(value);
 
 		if (element_exists[id][copiedName] == false){
 			element_exists[id][copiedName] = true;
@@ -146,7 +144,7 @@ bool poset_remove(id_type id, char const *value){
 			return false;
 		}
 
-		string name = copyName(value);
+		std::string name = copyName(value);
 
 		if (element_exists[id][name] == false){
 			// element nie istnieje
@@ -185,8 +183,8 @@ bool poset_add(id_type id, char const *value1, char const *value2){
 			return false;
 		}
 
-		string name1 = copyName(value1);
-		string name2 = copyName(value2);
+		std::string name1 = copyName(value1);
+		std::string name2 = copyName(value2);
 
 		if (element_exists[id][name1] == false || 
 				element_exists[id][name2] == false){
@@ -215,9 +213,9 @@ bool poset_add(id_type id, char const *value1, char const *value2){
 	}
 }
 
-map <string, bool> visited;
+std::map <std::string, bool> visited;
 
-void dfs(string node, id_type id){
+void dfs(std::string node, id_type id){
 	visited[node] = true;
 
 	for(auto v:graph[id][node]){
@@ -235,8 +233,8 @@ bool poset_del(id_type id, char const *value1, char const *value2){
 			return false;
 		}
 
-		string name1 = copyName(value1);
-		string name2 = copyName(value2);
+		std::string name1 = copyName(value1);
+		std::string name2 = copyName(value2);
 
 		if (element_exists[id][name1] == false || 
 				element_exists[id][name2] == false){
@@ -276,8 +274,8 @@ bool poset_test(id_type id, char const *value1, char const *value2){
 			return false;
 		}
 
-		string name1 = copyName(value1);
-		string name2 = copyName(value2);
+		std::string name1 = copyName(value1);
+		std::string name2 = copyName(value2);
 
 		if (element_exists[id][name1] == false || 
 				element_exists[id][name2] == false){
@@ -373,5 +371,6 @@ int32_t main(){
   poset_delete(p1);
   poset_delete(p1 + 1);
 
-	return 0;
+  std::cout << "ZAJEBIŚCIE\n";
+  return 0;
 }
