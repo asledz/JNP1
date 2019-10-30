@@ -1,10 +1,20 @@
 #ifndef JNPI_POSET_H
 #define JNPI_POSET_H
 
-#include <cstdio> 
+#ifdef __cplusplus
+
+#include <cstddef>
+namespace jnp1 {
+    extern "C" {
+
+#else
+
+#include <stddef.h>
+#include <stdbool.h>
+
+#endif
 
 // Tworzy nowy poset i zwraca jego identyfikator.
-extern "C" unsigned long poset_new(void);
 unsigned long poset_new(void);
 
 // Jeżeli istnieje poset o identyfikatorze id, usuwa go, a w przeciwnym
@@ -50,5 +60,10 @@ bool poset_test(unsigned long id, char const *value1, char const *value2);
 // Jeżeli istnieje poset o identyfikatorze id, usuwa wszystkie jego elementy
 // oraz relacje między nimi, a w przeciwnym przypadku nic nie robi.
 void poset_clear(unsigned long id);
+
+#ifdef __cplusplus
+    }
+}
+#endif
 
 #endif //JNPI_POSET_H
