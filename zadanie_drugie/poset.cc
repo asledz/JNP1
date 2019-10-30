@@ -19,300 +19,321 @@ const bool debug = true;
 
 using id_type = unsigned long;
 
-int globalCounter = 0;
 
-std::vector <id_type> free_ids;
+namespace {
+	
+	/* Zmienne globalne */
 
-std::map <id_type, std::map<std::string, std::set<std::string>>> graph;
-std::map <id_type, std::map<std::string, std::set<std::string>>> transposed_graph;
+	int globalCounter = 0;
 
-std::map <id_type, size_t> poset_active_elements;
+	std::vector <id_type> free_ids;
+	
+	std::map <id_type, std::map<std::string, std::set<std::string>>> graph;
+	
+	std::map <id_type, std::map<std::string, std::set<std::string>>> transposed_graph;
+	
+	std::map <id_type, size_t> poset_active_elements;
+	
+	std::map <id_type, std::map<std::string, bool>> element_exists;
+	
+	std::map <id_type, bool> poset_exists;
 
-std::map <id_type, std::map<std::string, bool>> element_exists;
+	std::map <std::string, bool> visited;
 
-std::map <id_type, bool> poset_exists;
+	// funkcja pomocnicza do skopiowania nazwy elementu
+	std::string copyName(char const *value){
+		int i = 0;
+		std::string copiedName = "";
 
-id_type poset_new(void){
-	id_type newId;
-
-	if (free_ids.empty() == false){
-		newId = free_ids.back();
-		free_ids.pop_back();
-	}else{
-		globalCounter += 1;
-		newId = globalCounter;
-	}
-
-	poset_exists[newId] = true;
-
-	return newId;
-}
-
-void poset_delete(id_type id){
-	if (poset_exists[id] == true){
-		poset_exists[id] = false;
-		poset_active_elements[id] = 0;
-		element_exists[id].clear();
-		graph[id].clear();
-		transposed_graph[id].clear();
-
-		free_ids.push_back(id);
-
-		// pomyslnie usunieto poset
-	}else{
-		// poset o takim numerze nie istnieje
-	}
-}
-
-size_t poset_size(id_type id){
-	if (poset_exists[id] == true){
-		return poset_active_elements[id];
-	}else{
-		// poset o takim numerze nie istnieje
-		return 0;
-	}
-}
-
-// funkcja pomocnicza do skopiowania nazwy elementu
-std::string copyName(char const *value){
-	int i = 0;
-	std::string copiedName = "";
-
-	while(value[i] != '\0'){
-		copiedName += value[i];
-		i++;
-	}
-
-	return copiedName;
-}
-
-bool check_name(char const *value){
-	if (value == NULL){
-		// niepoprawna nazwa 
-		return false;
-	}else{
-		return true;
-	}
-}
-
-void add_relation(id_type id, std::string name1, std::string name2){
-	graph[id][name1].insert(name2);
-	transposed_graph[id][name2].insert(name1);
-
-	return;
-}
-
-void delete_relation(id_type id, std::string name1, std::string name2){
-	auto it1 = graph[id][name1].find(name2);
-	graph[id][name1].erase(it1);
-
-	auto it2 = transposed_graph[id][name2].find(name1);
-	transposed_graph[id][name2].erase(it2);
-
-	return;
-}
-
-bool poset_insert(id_type id, char const *value){
-	if (poset_exists[id] == true){
-		if (check_name(value) == false){
-			return false;
+		while(value[i] != '\0'){
+			copiedName += value[i];
+			i++;
 		}
 
-		std::string copiedName = copyName(value);
+		return copiedName;
+	}
 
-		if (element_exists[id][copiedName] == false){
-			element_exists[id][copiedName] = true;
-			poset_active_elements[id] += 1;
-
-			add_relation(id, copiedName, copiedName);
-
-			// wierzcholek pomyslnie dodany
+	bool check_name(char const *value){
+		if (value == NULL){
+			// niepoprawna nazwa 
+			return false;
+		}else{
 			return true;
-		}else{
-			// taki element juz istnieje w danym posecie
-			return false;
 		}
-	}else{
-		// poset o takim id nie istnieje
-		return false;
 	}
+
+	void add_relation(id_type id, std::string name1, std::string name2){
+		graph[id][name1].insert(name2);
+		transposed_graph[id][name2].insert(name1);
+
+		return;
+	}
+
+	void delete_relation(id_type id, std::string name1, std::string name2){
+		auto it1 = graph[id][name1].find(name2);
+		graph[id][name1].erase(it1);
+
+		auto it2 = transposed_graph[id][name2].find(name1);
+		transposed_graph[id][name2].erase(it2);
+
+		return;
+	}
+
+	void dfs(std::string node, id_type id){
+		visited[node] = true;
+
+		for(auto v:graph[id][node]){
+			if (visited[v] == false){
+				dfs(v, id);
+			}
+		}
+
+		return;
+	}
+
+
+
+
+
 }
 
-bool poset_remove(id_type id, char const *value){
-	if (poset_exists[id]){	
-		if (check_name(value) == false){
-			return false;
-		}
 
-		std::string name = copyName(value);
 
-		if (element_exists[id][name] == false){
-			// element nie istnieje
+namespace jnp1 {
+	
+	id_type poset_new(void){
+		id_type newId;
 
-			return false;
-		}
-
-		for(auto v:graph[id][name]){
-			auto it = transposed_graph[id][v].find(name);
-			transposed_graph[id][v].erase(it);
-		}
-
-		graph[id][name].clear();
-
-		for(auto v:transposed_graph[id][name]){
-			auto it = graph[id][v].find(name);
-			graph[id][v].erase(it);
-		}
-
-		transposed_graph[id][name].clear();
-
-		element_exists[id][name] = false;
-
-		poset_active_elements[id] -= 1;
-
-		return true;
-	}else{
-		// poset o tym id nie istnieje
-		return false;
-	}
-}
-
-bool poset_add(id_type id, char const *value1, char const *value2){
-	if (poset_exists[id]){	
-		if (check_name(value1) == false || check_name(value2) == false){
-			return false;
-		}
-
-		std::string name1 = copyName(value1);
-		std::string name2 = copyName(value2);
-
-		if (element_exists[id][name1] == false || 
-				element_exists[id][name2] == false){
-			// ktorys z elementow nie istnieje
-
-			return false;
-		}
-
-		if (graph[id][name1].find(name2) != graph[id][name1].end() || 
-			graph[id][name2].find(name1) != graph[id][name2].end() ){
-			// relacja nie moze byc dodana
-			return false;
+		if (free_ids.empty() == false){
+			newId = free_ids.back();
+			free_ids.pop_back();
 		}else{
-			for(auto v:transposed_graph[id][name1]){
-				for(auto u:graph[id][name2]){
-					add_relation(id, v, u);
-				}
+			globalCounter += 1;
+			newId = globalCounter;
+		}
+
+		poset_exists[newId] = true;
+
+		return newId;
+	}
+
+	void poset_delete(id_type id){
+		if (poset_exists[id] == true){
+			poset_exists[id] = false;
+			poset_active_elements[id] = 0;
+			element_exists[id].clear();
+			graph[id].clear();
+			transposed_graph[id].clear();
+
+			free_ids.push_back(id);
+
+			// pomyslnie usunieto poset
+		}else{
+			// poset o takim numerze nie istnieje
+		}
+	}
+
+	size_t poset_size(id_type id){
+		if (poset_exists[id] == true){
+			return poset_active_elements[id];
+		}else{
+			// poset o takim numerze nie istnieje
+			return 0;
+		}
+	}
+
+	bool poset_insert(id_type id, char const *value){
+		if (poset_exists[id] == true){
+			if (check_name(value) == false){
+				return false;
 			}
 
-			return true;
-		}
+			std::string copiedName = copyName(value);
 
-	}else{
-		// poset o tym id nie istnieje
-		return false;
-	}
-}
+			if (element_exists[id][copiedName] == false){
+				element_exists[id][copiedName] = true;
+				poset_active_elements[id] += 1;
 
-std::map <std::string, bool> visited;
+				add_relation(id, copiedName, copiedName);
 
-void dfs(std::string node, id_type id){
-	visited[node] = true;
-
-	for(auto v:graph[id][node]){
-		if (visited[v] == false){
-			dfs(v, id);
-		}
-	}
-
-	return;
-}
-
-bool poset_del(id_type id, char const *value1, char const *value2){
-	if (poset_exists[id]){	
-		if (check_name(value1) == false || check_name(value2) == false){
+				// wierzcholek pomyslnie dodany
+				return true;
+			}else{
+				// taki element juz istnieje w danym posecie
+				return false;
+			}
+		}else{
+			// poset o takim id nie istnieje
 			return false;
 		}
+	}
 
-		std::string name1 = copyName(value1);
-		std::string name2 = copyName(value2);
+	bool poset_remove(id_type id, char const *value){
+		if (poset_exists[id]){	
+			if (check_name(value) == false){
+				return false;
+			}
 
-		if (element_exists[id][name1] == false || 
-				element_exists[id][name2] == false){
-			// ktorys z elementow nie istnieje
+			std::string name = copyName(value);
 
-			return false;
-		}
-
-		if (graph[id][name1].find(name2) != graph[id][name1].end()){
-			delete_relation(id, name1, name2);
-
-			visited.clear();
-
-			dfs(name1, id);
-
-			if (visited[name2] == true){
-				// usuniecie relacji zaburzy czesciowy porzadek
-				add_relation(id, name1, name2);
+			if (element_exists[id][name] == false){
+				// element nie istnieje
 
 				return false;
-			}else{
-				return true;
 			}
-		}else{
-			// relacja nie istnieje
-			return false;
-		}
-	}else{
-		// poset o tym id nie istnieje
-		return false;
-	}
-}
 
-bool poset_test(id_type id, char const *value1, char const *value2){
-	if (poset_exists[id]){	
-		if (check_name(value1) == false || check_name(value2) == false){
-			return false;
-		}
+			for(auto v:graph[id][name]){
+				auto it = transposed_graph[id][v].find(name);
+				transposed_graph[id][v].erase(it);
+			}
 
-		std::string name1 = copyName(value1);
-		std::string name2 = copyName(value2);
+			graph[id][name].clear();
 
-		if (element_exists[id][name1] == false || 
-				element_exists[id][name2] == false){
-			// ktorys z elementow nie istnieje
+			for(auto v:transposed_graph[id][name]){
+				auto it = graph[id][v].find(name);
+				graph[id][v].erase(it);
+			}
 
-			return false;
-		}
+			transposed_graph[id][name].clear();
 
-		if (graph[id][name1].find(name2) != graph[id][name1].end()){
-			// relacja istnieje
+			element_exists[id][name] = false;
+
+			poset_active_elements[id] -= 1;
+
 			return true;
 		}else{
-			// relacja nie istnieje
+			// poset o tym id nie istnieje
 			return false;
 		}
-	}else{
-		// poset o tym id nie istnieje
-		return false;
+	}
+
+
+	bool poset_add(id_type id, char const *value1, char const *value2){
+		if (poset_exists[id]){	
+			if (check_name(value1) == false || check_name(value2) == false){
+				return false;
+			}
+
+			std::string name1 = copyName(value1);
+			std::string name2 = copyName(value2);
+
+			if (element_exists[id][name1] == false || 
+					element_exists[id][name2] == false){
+				// ktorys z elementow nie istnieje
+
+				return false;
+			}
+
+			if (graph[id][name1].find(name2) != graph[id][name1].end() || 
+				graph[id][name2].find(name1) != graph[id][name2].end() ){
+				// relacja nie moze byc dodana
+				return false;
+			}else{
+				for(auto v:transposed_graph[id][name1]){
+					for(auto u:graph[id][name2]){
+						add_relation(id, v, u);
+					}
+				}
+
+				return true;
+			}
+
+		}else{
+			// poset o tym id nie istnieje
+			return false;
+		}
+	}
+
+	bool poset_del(id_type id, char const *value1, char const *value2){
+		if (poset_exists[id]){	
+			if (check_name(value1) == false || check_name(value2) == false){
+				return false;
+			}
+
+			std::string name1 = copyName(value1);
+			std::string name2 = copyName(value2);
+
+			if (element_exists[id][name1] == false || 
+					element_exists[id][name2] == false){
+				// ktorys z elementow nie istnieje
+
+				return false;
+			}
+
+			if (graph[id][name1].find(name2) != graph[id][name1].end()){
+				delete_relation(id, name1, name2);
+
+				visited.clear();
+
+				dfs(name1, id);
+
+				if (visited[name2] == true){
+					// usuniecie relacji zaburzy czesciowy porzadek
+					add_relation(id, name1, name2);
+
+					return false;
+				}else{
+					return true;
+				}
+			}else{
+				// relacja nie istnieje
+				return false;
+			}
+		}else{
+			// poset o tym id nie istnieje
+			return false;
+		}
+	}
+
+	bool poset_test(id_type id, char const *value1, char const *value2){
+		if (poset_exists[id]){	
+			if (check_name(value1) == false || check_name(value2) == false){
+				return false;
+			}
+
+			std::string name1 = copyName(value1);
+			std::string name2 = copyName(value2);
+
+			if (element_exists[id][name1] == false || 
+					element_exists[id][name2] == false){
+				// ktorys z elementow nie istnieje
+
+				return false;
+			}
+
+			if (graph[id][name1].find(name2) != graph[id][name1].end()){
+				// relacja istnieje
+				return true;
+			}else{
+				// relacja nie istnieje
+				return false;
+			}
+		}else{
+			// poset o tym id nie istnieje
+			return false;
+		}
+	}
+
+	void poset_clear(id_type id){
+		if (poset_exists[id]){
+			poset_active_elements[id] = 0;
+			element_exists[id].clear();
+			graph[id].clear();
+			transposed_graph[id].clear();
+
+			return;
+		}else{
+			// poset o takim id nie istnieje
+			return;
+		}
 	}
 }
 
-void poset_clear(id_type id){
-	if (poset_exists[id]){
-		poset_active_elements[id] = 0;
-		element_exists[id].clear();
-		graph[id].clear();
-		transposed_graph[id].clear();
 
-		return;
-	}else{
-		// poset o takim id nie istnieje
-		return;
-	}
-}
+using namespace jnp1;
 
 int32_t main(){
-	unsigned long p1;
+  unsigned long p1;
 
   p1 = poset_new();
 
