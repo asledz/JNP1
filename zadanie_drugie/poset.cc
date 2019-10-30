@@ -1,9 +1,15 @@
 #include "poset.h"
 
-namespace util {
+#ifdef NDEBUG
+const bool debug = false;
+#else
+const bool debug = true;
+#endif
+
+namespace {
 
 }
 
-namespace poset {
+namespace jnp1 {
 
 }
