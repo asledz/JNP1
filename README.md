@@ -16,7 +16,7 @@ Moduł obsługujący zbiory częściowo uporządkowane (ang. poset), których el
 Rozwiązanie znajduje się w folderze [zadanie_drugie](/zadanie_drugie).
 
 
-# Obsługa svn:
+## Obsługa svn:
 
 Dodawanie pliku do repo:
 ```
