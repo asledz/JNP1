@@ -23,9 +23,9 @@ namespace {
     using id_type = unsigned long;
     using free_id_vector = std::vector<id_type>;
     using string_set = std::set<std::string>;
-    using graph_type = std::map<id_type, std::map<std::string, string_set>>;
+    using graph_type = std::map <id_type, std::map<std::string, string_set>>;
     using active_elements_map = std::map<id_type, size_t>;
-    using element_exist_map = std::map<id_type, std::map<std::string, bool>>;
+    using element_exist_map = std::map <id_type, std::map<std::string, bool>>;
     using poset_exsit_map = std::map<id_type, bool>;
     using visited_map = std::map<std::string, bool>;
 
