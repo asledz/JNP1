@@ -1,13 +1,13 @@
 #include "poset.h"
 
-#include<iostream>
-#include<vector>
-#include<map>
-#include<set>
-#include<unordered_map>
-#include<algorithm>
-#include<bitset>
-#include<queue>
+#include <iostream>
+#include <vector>
+#include <map>
+#include <set>
+#include <unordered_map>
+#include <algorithm>
+#include <bitset>
+#include <queue>
 #include <math.h>
 #include <assert.h>
 
@@ -17,7 +17,7 @@ const bool debug = false;
 const bool debug = true;
 #endif
 
-#define debugStream if (!debug) {} else std::cerr 
+#define debugStream if (!debug) {} else std::cerr
 
 
 namespace {
@@ -25,37 +25,39 @@ namespace {
 
     int globalCounter = 0;
 
-    std::vector<id_type> &get_free_ids () {
+    std::vector<id_type> &get_free_ids() {
         static std::vector<id_type> *free_ids = new std::vector<id_type>();
         return *free_ids;
     }
 
-    std::map<id_type, std::map<std::string, std::set<std::string>>> &get_graph () {
+    std::map<id_type, std::map<std::string, std::set<std::string>>> &
+    get_graph() {
         static std::map<id_type, std::map<std::string, std::set<std::string>>> *graph = new std::map<id_type, std::map<std::string, std::set<std::string>>>();
         return *graph;
     }
 
-    std::map<id_type, std::map<std::string, std::set<std::string>>> &get_transposed_graph () {
+    std::map<id_type, std::map<std::string, std::set<std::string>>> &
+    get_transposed_graph() {
         static std::map<id_type, std::map<std::string, std::set<std::string>>> *transposed_graph = new std::map<id_type, std::map<std::string, std::set<std::string>>>();
         return *transposed_graph;
     }
 
-    std::map<id_type, size_t> &get_poset_active_elements () {
+    std::map<id_type, size_t> &get_poset_active_elements() {
         static std::map<id_type, size_t> *poset_active_elements = new std::map<id_type, size_t>();
         return *poset_active_elements;
     }
 
-    std::map<id_type, std::map<std::string, bool>> &get_element_exists () {
+    std::map<id_type, std::map<std::string, bool>> &get_element_exists() {
         static std::map<id_type, std::map<std::string, bool>> *element_exists = new std::map<id_type, std::map<std::string, bool>>();
         return *element_exists;
     }
 
-    std::map<id_type, bool> &get_poset_exists () {
+    std::map<id_type, bool> &get_poset_exists() {
         static std::map<id_type, bool> *poset_exists = new std::map<id_type, bool>();
         return *poset_exists;
     }
 
-    std::map<std::string, bool> &get_visited () {
+    std::map<std::string, bool> &get_visited() {
         static std::map<std::string, bool> *visited = new std::map<std::string, bool>();
         return *visited;
     }
@@ -103,7 +105,7 @@ namespace {
         get_visited()[node] = true;
 
         for (auto v:get_graph()[id][node]) {
-            if (get_visited()[v] == false) {
+            if (!get_visited()[v]) {
                 dfs(v, id);
             }
         }
@@ -118,10 +120,10 @@ namespace jnp1 {
 
     id_type poset_new(void) {
         debugStream << "poset_new()" << std::endl;
-        
+
         id_type newId;
 
-        if (get_free_ids().empty() == false) {
+        if (!get_free_ids().empty()) {
             newId = get_free_ids().back();
             get_free_ids().pop_back();
         } else {
@@ -135,7 +137,7 @@ namespace jnp1 {
     }
 
     void poset_delete(id_type id) {
-        if (get_poset_exists()[id] == true) {
+        if (get_poset_exists()[id]) {
             get_poset_exists()[id] = false;
             get_poset_active_elements()[id] = 0;
             get_element_exists()[id].clear();
@@ -151,7 +153,7 @@ namespace jnp1 {
     }
 
     size_t poset_size(id_type id) {
-        if (get_poset_exists()[id] == true) {
+        if (get_poset_exists()[id]) {
             return get_poset_active_elements()[id];
         } else {
             // poset o takim numerze nie istnieje
@@ -160,14 +162,14 @@ namespace jnp1 {
     }
 
     bool poset_insert(id_type id, char const *value) {
-        if (get_poset_exists()[id] == true) {
-            if (check_name(value) == false) {
+        if (get_poset_exists()[id]) {
+            if (!check_name(value)) {
                 return false;
             }
 
             std::string copiedName = copyName(value);
 
-            if (get_element_exists()[id][copiedName] == false) {
+            if (!get_element_exists()[id][copiedName]) {
                 get_element_exists()[id][copiedName] = true;
                 get_poset_active_elements()[id] += 1;
 
@@ -187,13 +189,13 @@ namespace jnp1 {
 
     bool poset_remove(id_type id, char const *value) {
         if (get_poset_exists()[id]) {
-            if (check_name(value) == false) {
+            if (!check_name(value)) {
                 return false;
             }
 
             std::string name = copyName(value);
 
-            if (get_element_exists()[id][name] == false) {
+            if (!get_element_exists()[id][name]) {
                 // element nie istnieje
 
                 return false;
@@ -227,22 +229,24 @@ namespace jnp1 {
 
     bool poset_add(id_type id, char const *value1, char const *value2) {
         if (get_poset_exists()[id]) {
-            if (check_name(value1) == false || check_name(value2) == false) {
+            if (!check_name(value1) || !check_name(value2)) {
                 return false;
             }
 
             std::string name1 = copyName(value1);
             std::string name2 = copyName(value2);
 
-            if (get_element_exists()[id][name1] == false ||
-                get_element_exists()[id][name2] == false) {
+            if (!get_element_exists()[id][name1] ||
+                !get_element_exists()[id][name2]) {
                 // ktorys z elementow nie istnieje
 
                 return false;
             }
 
-            if (get_graph()[id][name1].find(name2) != get_graph()[id][name1].end() ||
-                get_graph()[id][name2].find(name1) != get_graph()[id][name2].end()) {
+            if (get_graph()[id][name1].find(name2) !=
+                get_graph()[id][name1].end() ||
+                get_graph()[id][name2].find(name1) !=
+                get_graph()[id][name2].end()) {
                 // relacja nie moze byc dodana
                 return false;
             } else {
@@ -263,28 +267,29 @@ namespace jnp1 {
 
     bool poset_del(id_type id, char const *value1, char const *value2) {
         if (get_poset_exists()[id]) {
-            if (check_name(value1) == false || check_name(value2) == false) {
+            if (!check_name(value1) || !check_name(value2)) {
                 return false;
             }
 
             std::string name1 = copyName(value1);
             std::string name2 = copyName(value2);
 
-            if (get_element_exists()[id][name1] == false ||
-                get_element_exists()[id][name2] == false) {
+            if (!get_element_exists()[id][name1] ||
+                !get_element_exists()[id][name2]) {
                 // ktorys z elementow nie istnieje
 
                 return false;
             }
 
-            if (get_graph()[id][name1].find(name2) != get_graph()[id][name1].end()) {
+            if (get_graph()[id][name1].find(name2) !=
+                get_graph()[id][name1].end()) {
                 delete_relation(id, name1, name2);
 
                 get_visited().clear();
 
                 dfs(name1, id);
 
-                if (get_visited()[name2] == true) {
+                if (get_visited()[name2]) {
                     // usuniecie relacji zaburzy czesciowy porzadek
                     add_relation(id, name1, name2);
 
@@ -304,21 +309,22 @@ namespace jnp1 {
 
     bool poset_test(id_type id, char const *value1, char const *value2) {
         if (get_poset_exists()[id]) {
-            if (check_name(value1) == false || check_name(value2) == false) {
+            if (!check_name(value1) || !check_name(value2)) {
                 return false;
             }
 
             std::string name1 = copyName(value1);
             std::string name2 = copyName(value2);
 
-            if (get_element_exists()[id][name1] == false ||
-                get_element_exists()[id][name2] == false) {
+            if (!get_element_exists()[id][name1] ||
+                !get_element_exists()[id][name2]) {
                 // ktorys z elementow nie istnieje
 
                 return false;
             }
 
-            if (get_graph()[id][name1].find(name2) != get_graph()[id][name1].end()) {
+            if (get_graph()[id][name1].find(name2) !=
+                get_graph()[id][name1].end()) {
                 // relacja istnieje
                 return true;
             } else {
