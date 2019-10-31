@@ -157,8 +157,8 @@ namespace jnp1 {
             newId = get_free_ids().back();
             get_free_ids().pop_back();
         } else {
-            globalCounter += 1;
             newId = globalCounter;
+            globalCounter += 1;
         }
 
         get_poset_exists()[newId] = true;
@@ -204,7 +204,7 @@ namespace jnp1 {
         if (get_poset_exists()[id]) {
             if (!check_name(value)) {
                 debugStream << ": invalid value "
-                            << quotation_mark_string(value) << std::endl;
+                            << bracket_string(value) << std::endl;
                 return false;
             }
 
@@ -227,7 +227,7 @@ namespace jnp1 {
                 return false;
             }
         } else {
-            debugStream << ": poset " << id << " does not exists" << std::endl;
+            debugStream << ": poset " << id << " does not exist" << std::endl;
             return false;
         }
     }
@@ -247,7 +247,7 @@ namespace jnp1 {
             if (!get_element_exists()[id][name]) {
                 debugStream << ": poset " << id << ", element "
                             << quotation_mark_string(value)
-                            << " does not exists" << std::endl;
+                            << " does not exist" << std::endl;
                 return false;
             }
 
@@ -393,7 +393,7 @@ namespace jnp1 {
                 debugStream << ": poset " << id << ", relation ("
                             << quotation_mark_string(value1) << ", "
                             << quotation_mark_string(value2)
-                            << ") does not exist" << std::endl;
+                            << ") cannot be deleted" << std::endl;
                 return false;
             }
         } else {
@@ -442,7 +442,7 @@ namespace jnp1 {
                 debugStream << ": poset " << id << ", relation ("
                             << quotation_mark_string(value1) << ", "
                             << quotation_mark_string(value2)
-                            << ") does not exists" << std::endl;
+                            << ") does not exist" << std::endl;
                 return false;
             }
         } else {
