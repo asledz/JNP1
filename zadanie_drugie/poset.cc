@@ -18,12 +18,19 @@ const bool debug = true;
 #endif
 
 #define debug if (!debug) {} else std::cerr << __func__
-#define prettyString(str) "\"" << ((str) == nullptr ? "NULL" : (str)) << "\""
-#define bracketString(str) "(" << ((str) == nullptr ? "NULL" : (str)) << ")"
+#define quotation_mark_string(str) "\"" << ((str) == nullptr ? "NULL" : (str)) << "\""
+#define bracket_string(str) "(" << ((str) == nullptr ? "NULL" : (str)) << ")"
 
 
 namespace {
     using id_type = unsigned long;
+    using string_set = std::set<std::string>;
+    using string_to_set_map = std::map<std::string, string_set>;
+    using graph_type = std::map<id_type, string_to_set_map>;
+    using id_type_to_size_map = std::map<id_type, size_t>;
+    using element_existance_map = std::map<id_type, std::map<std::string, bool>>;
+    using poset_exsitance_map = std::map<id_type, bool>;
+    using visited_map = std::map<std::string, bool>;
 
     int globalCounter = 0;
 
@@ -32,33 +39,33 @@ namespace {
         return *free_ids;
     }
 
-    std::map<id_type, std::map<std::string, std::set<std::string>>> &get_graph() {
-        static std::map<id_type, std::map<std::string, std::set<std::string>>> *graph = new std::map<id_type, std::map<std::string, std::set<std::string>>>();
+    graph_type &get_graph() {
+        static graph_type *graph = new graph_type();
         return *graph;
     }
 
-    std::map<id_type, std::map<std::string, std::set<std::string>>> &get_transposed_graph() {
-        static std::map<id_type, std::map<std::string, std::set<std::string>>> *transposed_graph = new std::map<id_type, std::map<std::string, std::set<std::string>>>();
+    graph_type &get_transposed_graph() {
+        static graph_type *transposed_graph = new graph_type();
         return *transposed_graph;
     }
 
-    std::map<id_type, size_t> &get_poset_active_elements() {
-        static std::map<id_type, size_t> *poset_active_elements = new std::map<id_type, size_t>();
+    id_type_to_size_map &get_poset_active_elements() {
+        static id_type_to_size_map *poset_active_elements = new id_type_to_size_map();
         return *poset_active_elements;
     }
 
-    std::map<id_type, std::map<std::string, bool>> &get_element_exists() {
-        static std::map<id_type, std::map<std::string, bool>> *element_exists = new std::map<id_type, std::map<std::string, bool>>();
+    element_existance_map &get_element_exists() {
+        static element_existance_map *element_exists = new element_existance_map();
         return *element_exists;
     }
 
-    std::map<id_type, bool> &get_poset_exists() {
-        static std::map<id_type, bool> *poset_exists = new std::map<id_type, bool>();
+    poset_exsitance_map &get_poset_exists() {
+        static poset_exsitance_map *poset_exists = new poset_exsitance_map();
         return *poset_exists;
     }
 
-    std::map<std::string, bool> &get_visited() {
-        static std::map<std::string, bool> *visited = new std::map<std::string, bool>();
+    visited_map &get_visited() {
+        static visited_map *visited = new visited_map();
         return *visited;
     }
 
@@ -167,10 +174,10 @@ namespace jnp1 {
     }
 
     bool poset_insert(id_type id, char const *value) {
-        debug << "(" << id << ", " << prettyString(value) << ")" << std::endl;
+        debug << "(" << id << ", " << quotation_mark_string(value) << ")" << std::endl;
         if (get_poset_exists()[id]) {
             if (!check_name(value)) {
-                debug << ": invalid value " << prettyString(value) << std::endl;
+                debug << ": invalid value " << quotation_mark_string(value) << std::endl;
                 return false;
             }
 
@@ -182,10 +189,10 @@ namespace jnp1 {
 
                 add_relation(id, copiedName, copiedName);
 
-                debug << ": poset " << id << ", element " << prettyString(value) << " inserted" << std::endl;
+                debug << ": poset " << id << ", element " << quotation_mark_string(value) << " inserted" << std::endl;
                 return true;
             } else {
-                debug << ": poset " << id << ", element " << prettyString(value) << " already exists" << std::endl;
+                debug << ": poset " << id << ", element " << quotation_mark_string(value) << " already exists" << std::endl;
                 return false;
             }
         } else {
@@ -195,17 +202,17 @@ namespace jnp1 {
     }
 
     bool poset_remove(id_type id, char const *value) {
-        debug << "(" << id << ", " << prettyString(value) << ")" << std::endl;
+        debug << "(" << id << ", " << quotation_mark_string(value) << ")" << std::endl;
         if (get_poset_exists()[id]) {
             if (!check_name(value)) {
-                debug << ": invalid value " << prettyString(value) << std::endl;
+                debug << ": invalid value " << quotation_mark_string(value) << std::endl;
                 return false;
             }
 
             std::string name = copyName(value);
 
             if (!get_element_exists()[id][name]) {
-                debug << ": poset " << id << ", element " << prettyString(value) << " does not exists" << std::endl;
+                debug << ": poset " << id << ", element " << quotation_mark_string(value) << " does not exists" << std::endl;
                 return false;
             }
 
@@ -227,7 +234,7 @@ namespace jnp1 {
 
             get_poset_active_elements()[id] -= 1;
 
-            debug << ": poset " << id << ", element " << prettyString(value) << " removed" << std::endl;
+            debug << ": poset " << id << ", element " << quotation_mark_string(value) << " removed" << std::endl;
             return true;
         } else {
             debug << ": poset " << id << " does not exist" << std::endl;
@@ -237,14 +244,14 @@ namespace jnp1 {
 
 
     bool poset_add(id_type id, char const *value1, char const *value2) {
-        debug << "(" << id << ", " << prettyString(value1) << ", " << prettyString(value2) << ")" << std::endl;
+        debug << "(" << id << ", " << quotation_mark_string(value1) << ", " << quotation_mark_string(value2) << ")" << std::endl;
         if (get_poset_exists()[id]) {
             if (!check_name(value1) || !check_name(value2)) {
                 if (!check_name(value1)) {
-                    debug << ": invalid value1 " << bracketString(value1) << std::endl;
+                    debug << ": invalid value1 " << bracket_string(value1) << std::endl;
                 }
                 if (!check_name(value2)) {
-                    debug << ": invalid value2 " << bracketString(value2) << std::endl;
+                    debug << ": invalid value2 " << bracket_string(value2) << std::endl;
                 }
                 return false;
             }
@@ -254,7 +261,7 @@ namespace jnp1 {
 
             if (!get_element_exists()[id][name1] ||
                 !get_element_exists()[id][name2]) {
-                debug << ": poset " << id << ", element " << prettyString(value1) << " or " << prettyString(value2)
+                debug << ": poset " << id << ", element " << quotation_mark_string(value1) << " or " << quotation_mark_string(value2)
                       << " does not exist" << std::endl;
                 return false;
             }
@@ -263,7 +270,7 @@ namespace jnp1 {
                 get_graph()[id][name1].end() ||
                 get_graph()[id][name2].find(name1) !=
                 get_graph()[id][name2].end()) {
-                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                debug << ": poset " << id << ", relation (" << quotation_mark_string(value1) << ", " << quotation_mark_string(value2)
                       << ") cannot be added" << std::endl;
                 return false;
             } else {
@@ -272,7 +279,7 @@ namespace jnp1 {
                         add_relation(id, v, u);
                     }
                 }
-                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                debug << ": poset " << id << ", relation (" << quotation_mark_string(value1) << ", " << quotation_mark_string(value2)
                       << ") added" << std::endl;
                 return true;
             }
@@ -284,15 +291,15 @@ namespace jnp1 {
     }
 
     bool poset_del(id_type id, char const *value1, char const *value2) {
-        debug << "(" << id << ", " << prettyString(value1) << ", " << prettyString(value2) << ")" << std::endl;
+        debug << "(" << id << ", " << quotation_mark_string(value1) << ", " << quotation_mark_string(value2) << ")" << std::endl;
 
         if (get_poset_exists()[id]) {
             if (!check_name(value1) || !check_name(value2)) {
                 if (!check_name(value1)) {
-                    debug << ": invalid value1 " << bracketString(value1) << std::endl;
+                    debug << ": invalid value1 " << bracket_string(value1) << std::endl;
                 }
                 if (!check_name(value2)) {
-                    debug << ": invalid value2 " << bracketString(value2) << std::endl;
+                    debug << ": invalid value2 " << bracket_string(value2) << std::endl;
                 }
                 return false;
             }
@@ -302,7 +309,7 @@ namespace jnp1 {
 
             if (!get_element_exists()[id][name1] ||
                 !get_element_exists()[id][name2]) {
-                debug << ": poset " << id << ", element " << prettyString(value1) << " or " << prettyString(value2)
+                debug << ": poset " << id << ", element " << quotation_mark_string(value1) << " or " << quotation_mark_string(value2)
                       << " does not exist" << std::endl;
                 return false;
             }
@@ -316,17 +323,17 @@ namespace jnp1 {
                 dfs(name1, id);
 
                 if (get_visited()[name2]) {
-                    debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                    debug << ": poset " << id << ", relation (" << quotation_mark_string(value1) << ", " << quotation_mark_string(value2)
                           << ") cannot be deleted" << std::endl;
                     add_relation(id, name1, name2);
                     return false;
                 } else {
-                    debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                    debug << ": poset " << id << ", relation (" << quotation_mark_string(value1) << ", " << quotation_mark_string(value2)
                           << ") deleted" << std::endl;
                     return true;
                 }
             } else {
-                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                debug << ": poset " << id << ", relation (" << quotation_mark_string(value1) << ", " << quotation_mark_string(value2)
                       << ") does not exist" << std::endl;
                 return false;
             }
@@ -337,14 +344,14 @@ namespace jnp1 {
     }
 
     bool poset_test(id_type id, char const *value1, char const *value2) {
-        debug << "(" << id << ", " << prettyString(value1) << ", " << prettyString(value2) << ")" << std::endl;
+        debug << "(" << id << ", " << quotation_mark_string(value1) << ", " << quotation_mark_string(value2) << ")" << std::endl;
         if (get_poset_exists()[id]) {
             if (!check_name(value1) || !check_name(value2)) {
                 if (!check_name(value1)) {
-                    debug << ": invalid value1 " << bracketString(value1) << std::endl;
+                    debug << ": invalid value1 " << bracket_string(value1) << std::endl;
                 }
                 if (!check_name(value2)) {
-                    debug << ": invalid value2 " << bracketString(value2) << std::endl;
+                    debug << ": invalid value2 " << bracket_string(value2) << std::endl;
                 }
                 return false;
             }
@@ -354,18 +361,18 @@ namespace jnp1 {
 
             if (!get_element_exists()[id][name1] ||
                 !get_element_exists()[id][name2]) {
-                debug << ": poset " << id << ", element " << prettyString(value1) << " or " << prettyString(value2)
+                debug << ": poset " << id << ", element " << quotation_mark_string(value1) << " or " << quotation_mark_string(value2)
                       << " does not exist" << std::endl;
                 return false;
             }
 
             if (get_graph()[id][name1].find(name2) !=
                 get_graph()[id][name1].end()) {
-                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                debug << ": poset " << id << ", relation (" << quotation_mark_string(value1) << ", " << quotation_mark_string(value2)
                       << ") exists" << std::endl;
                 return true;
             } else {
-                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                debug << ": poset " << id << ", relation (" << quotation_mark_string(value1) << ", " << quotation_mark_string(value2)
                       << ") does not exists" << std::endl;
                 return false;
             }
