@@ -1,6 +1,9 @@
 # JNP1
->Języki i narzędzia programowania 1, MIMUW
 
+**Języki i narzędzia programowania 1**, MIMUW 
+
+**Languages and tools for programming I**, University of Warsaw, Faculty of Mathematics, Informatics and Mechanics
+___
 ## Treści zadań
 Treści zadań znajdują się w [tutaj](/common).
 
@@ -13,7 +16,7 @@ Moduł obsługujący zbiory częściowo uporządkowane (ang. poset), których el
 Rozwiązanie znajduje się w folderze [zadanie_drugie](/zadanie_drugie).
 
 
-# Obsługa svn:
+## Obsługa svn:
 
 Dodawanie pliku do repo:
 ```
