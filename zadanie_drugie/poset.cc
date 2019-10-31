@@ -24,18 +24,17 @@ const bool debug = true;
 
 namespace {
     using id_type = unsigned long;
-    using string_set = std::set<std::string>;
-    using string_to_set_map = std::map<std::string, string_set>;
-    using graph_type = std::map<id_type, string_to_set_map>;
-    using id_type_to_size_map = std::map<id_type, size_t>;
+    using free_id_vector = std::vector<id_type>;
+    using graph_type = std::map<id_type, std::map<std::string, std::set<std::string>>>;
+    using active_elements_map = std::map<id_type, size_t>;
     using element_existance_map = std::map<id_type, std::map<std::string, bool>>;
     using poset_exsitance_map = std::map<id_type, bool>;
     using visited_map = std::map<std::string, bool>;
 
     int globalCounter = 0;
 
-    std::vector<id_type> &get_free_ids() {
-        static std::vector<id_type> *free_ids = new std::vector<id_type>();
+    free_id_vector &get_free_ids() {
+        static free_id_vector *free_ids = new free_id_vector();
         return *free_ids;
     }
 
@@ -49,8 +48,8 @@ namespace {
         return *transposed_graph;
     }
 
-    id_type_to_size_map &get_poset_active_elements() {
-        static id_type_to_size_map *poset_active_elements = new id_type_to_size_map();
+    active_elements_map &get_poset_active_elements() {
+        static active_elements_map *poset_active_elements = new active_elements_map();
         return *poset_active_elements;
     }
 
