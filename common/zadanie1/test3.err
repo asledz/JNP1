@@ -1,0 +1,42 @@
+Error in line 1: # najpierw poprawne dane
+Error in line 6: # zły numer kursu
+Error in line 7: 3""" 6:00 Banacha 7:00 Pasteura 8:00 Winnicka
+Error in line 8: # głupia trasa
+Error in line 9: 4 6:00 Winnicka 7:00
+Error in line 10: # złe czasy
+Error in line 11: 5 35:12 Zieleniecka 3:12 Okopowa
+Error in line 12: 6 2:71 Banacha 1:11 Pasteura
+Error in line 13: 7 6:00 Winnicka 4:030 Pasteura
+Error in line 14: # czasy spoza zakresu
+Error in line 15: 8 6:00 Banacha 22:22 Pasteura
+Error in line 16: 9 4:44 Banacha 5:56 Pasteura
+Error in line 17: # przystanki w złej kolejości
+Error in line 18: 10 12:01 Winnicka 12:00 Banacha
+Error in line 19: 11 12:00 Banacha 12:00 Pasteura
+Error in line 20: # powtarzające się przystanki
+Error in line 21: 12 6:00 Banacha 7:00 Pasteura 8:00 Banacha
+Error in line 22: # teraz bilety
+Error in line 23: # poprawny
+Error in line 25: # zła nazwa
+Error in line 26: Zły 1.22 12
+Error in line 27: # zera wiodące
+Error in line 28: Niedobry 1.22 0012
+Error in line 29: # brak miejsc po przecinku
+Error in line 30: NiedobryA 1.2 12
+Error in line 31: NiedobryB 1. 12
+Error in line 32: NiedobryC 1 12
+Error in line 33: # miejsca po przecinku, ale nie tam gdzie trzeba
+Error in line 34: NiedobryD 1.22 1.22
+Error in line 35: # spacje w różnych miejscach
+Error in line 38: # ujemna cena
+Error in line 39: NiedobryG -1.23 1
+Error in line 41: # pytania o bilety w złym kierunku
+Error in line 42: ? Banacha 1 Winnicka
+Error in line 43: ? Banacha 1 Winnicka 2 Banacha
+Error in line 44: # teraz złe pytania
+Error in line 45: ? Banacha 1
+Error in line 46: ? Banacha Winnicka
+Error in line 47: ? Banacha 1 Winnicka 2
+Error in line 48: ?
+Error in line 49: ?Banacha 1 Winnicka
+Error in line 50: ? Niemaprzystanku 1 Winnicka

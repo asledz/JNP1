@@ -1,0 +1,43 @@
+Error in line 5: # Czy jak mamy pytanie o bilet, a zaden bilet nie zostal dodany , to uznajemy zapytanie za bledne czy uznajemy ze nie mozna kupic biletow na podana trase ?
+Error in line 8: # Jaką nazwę przystanku wypisać, jeśli jest więcej niż jeden przystanek na którym trzeba czekać?
+Error in line 9: # Nazwę pierwszego z nich
+Error in line 13: # Czy jeżeli dostajemy wiersz o dodaniu kursu lub biletu i kurs o danym numerze / bilet o danej nazwie zostały dodane wcześniej, to czy mamy wypisać błąd czy nadpisać czy zignorować wiersz?
+Error in line 14: # Wypisać jako błąd.
+Error in line 15: 1 6:00 A 7:00 B 8:00 C
+Error in line 16: Bilecik 1000.00 120
+Error in line 18: # Numer kursu jest nieujemny, ale może to być 0.
+Error in line 22: # Czy obie godziny 9:13 i 09:13 są poprawnymi formatami?
+Error in line 23: # Nie.
+Error in line 24: 4 09:00 B 10:00 C 11:00 D
+Error in line 26: # Czy podawane w zapytaniach numery linii tramwajowych też mogą mieć zera wiodące?
+Error in line 27: # Tak.
+Error in line 30: # Czy między argumentami znajduje się tylko jedna spacja, czy dowolnie większa?
+Error in line 31: # Jedna (format linii jest dokładnie taki jak w treści).
+Error in line 32: 5  8:00  B 09:00 C 10:00 D
+Error in line 33: 6 8:00 B  09:00 C 10:00 D
+Error in line 34: 7 8:00 B 09:00  C 10:00 D
+Error in line 35: 8 8:00 B 09:00 C  10:00 D
+Error in line 36: 9 8:00 B 09:00 C 10:00 D
+Error in line 38: # Czy są górne ograniczenia na wartości numeru kursu, ceny i czasu ważności biletu?
+Error in line 39: # Można przyjąć jakieś rozsądne ograniczenia, dokładnie jakie pozostawiamy do decyzji implementującego.
+Error in line 40: # -> to trochę testuje test 6
+Error in line 42: # Czy w przypadku, w którym zaproponowana przez użytkownika droga jednocześnie wymaga czekania i nie daje się zrealizować przy pomocy maksymalnie 3 biletów to wypisujemy :-( nazwa_przystanku_gdzie_trzeba_czekać czy :-| ?
+Error in line 43: # :-( nazwa_przystanku_gdzie_trzeba_czekać
+Error in line 47: # Czy jeśli w pytaniu o bilety:
+Error in line 48: # 1) któryś z numerów kursów nie został wcześniej dodany
+Error in line 49: ? A 11 B
+Error in line 50: # 2) trasa któregoś z kursów nie prowadzi przez dany przystanek
+Error in line 51: ? A 2 D
+Error in line 52: # 3) godzina przyjazdu na przystanek jest późniejsza niż godzina odjazdu kolejnego kursu
+Error in line 53: ? A 2 B 1 C
+Error in line 54: # to w których przypadkach należy uznać wiersz za niepoprawny i wypisać błąd, a w których należy wypisać, że nie da się kupić biletów?
+Error in line 55: #  
+Error in line 56: # We wszystkich tych przypadkach uznajemy wiersz za niepoprawny.
+Error in line 58: # Jaka jest minimalna argumentów przystanek_i w zapytaniach typu 1. i 3.? W szczególności, czy linie "12" lub "?" są poprawne?
+Error in line 59: # Linia musi mieć jakiś przystanek, pytanie o bilety musi obejmować co najmniej jeden odcinek. W szczególności nie są.
+Error in line 60: 11
+Error in line 61: ?
+Error in line 63: # Czy komendy mogą mieć spacje na początku/końcu linii 
+Error in line 64:     14 21:22 Warszawa 21:23 Boston   
+Error in line 66: # Kilka optymalnych zestawów na tę samą trasę
+Error in line 67: # Skrypt sprawdzający usuwa napis IGNORUJ...

@@ -1,0 +1,50 @@
+# najpierw poprawne dane
+1 8:00 Winnicka 9:00 Banacha
+2 6:00 Banacha 7:00 Pasteura 8:00 Winnicka
+Niedlugi 2.30 3
+Dlugi Drogi 3.80 60
+# zły numer kursu
+3""" 6:00 Banacha 7:00 Pasteura 8:00 Winnicka
+# głupia trasa
+4 6:00 Winnicka 7:00
+# złe czasy
+5 35:12 Zieleniecka 3:12 Okopowa
+6 2:71 Banacha 1:11 Pasteura
+7 6:00 Winnicka 4:030 Pasteura
+# czasy spoza zakresu
+8 6:00 Banacha 22:22 Pasteura
+9 4:44 Banacha 5:56 Pasteura
+# przystanki w złej kolejości
+10 12:01 Winnicka 12:00 Banacha
+11 12:00 Banacha 12:00 Pasteura
+# powtarzające się przystanki
+12 6:00 Banacha 7:00 Pasteura 8:00 Banacha
+# teraz bilety
+# poprawny
+Ok Ok 0.12 1
+# zła nazwa
+Zły 1.22 12
+# zera wiodące
+Niedobry 1.22 0012
+# brak miejsc po przecinku
+NiedobryA 1.2 12
+NiedobryB 1. 12
+NiedobryC 1 12
+# miejsca po przecinku, ale nie tam gdzie trzeba
+NiedobryD 1.22 1.22
+# spacje w różnych miejscach
+   DobryE 8.88 8
+ DobryF   8.88 8
+# ujemna cena
+NiedobryG -1.23 1
+
+# pytania o bilety w złym kierunku
+? Banacha 1 Winnicka
+? Banacha 1 Winnicka 2 Banacha
+# teraz złe pytania
+? Banacha 1
+? Banacha Winnicka
+? Banacha 1 Winnicka 2
+?
+?Banacha 1 Winnicka
+? Niemaprzystanku 1 Winnicka
