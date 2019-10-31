@@ -3,13 +3,13 @@
 
 #ifdef __cplusplus
 
-#include <cstddef>
+#include <cstdlib>
 namespace jnp1 {
-    extern "C" {
+extern "C" {
 
 #else
 
-#include <stddef.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 #endif
