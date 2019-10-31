@@ -17,28 +17,48 @@ const bool debug = false;
 const bool debug = true;
 #endif
 
-using id_type = unsigned long;
+#define debugStream if (!debug) {} else std::cerr 
 
 
 namespace {
-
-    /* Zmienne globalne */
+    using id_type = unsigned long;
 
     int globalCounter = 0;
 
-    std::vector<id_type> free_ids;
+    std::vector<id_type> &get_free_ids () {
+        static std::vector<id_type> *free_ids = new std::vector<id_type>();
+        return *free_ids;
+    }
 
-    std::map<id_type, std::map<std::string, std::set<std::string>>> graph;
+    std::map<id_type, std::map<std::string, std::set<std::string>>> &get_graph () {
+        static std::map<id_type, std::map<std::string, std::set<std::string>>> *graph = new std::map<id_type, std::map<std::string, std::set<std::string>>>();
+        return *graph;
+    }
 
-    std::map<id_type, std::map<std::string, std::set<std::string>>> transposed_graph;
+    std::map<id_type, std::map<std::string, std::set<std::string>>> &get_transposed_graph () {
+        static std::map<id_type, std::map<std::string, std::set<std::string>>> *transposed_graph = new std::map<id_type, std::map<std::string, std::set<std::string>>>();
+        return *transposed_graph;
+    }
 
-    std::map<id_type, size_t> poset_active_elements;
+    std::map<id_type, size_t> &get_poset_active_elements () {
+        static std::map<id_type, size_t> *poset_active_elements = new std::map<id_type, size_t>();
+        return *poset_active_elements;
+    }
 
-    std::map<id_type, std::map<std::string, bool>> element_exists;
+    std::map<id_type, std::map<std::string, bool>> &get_element_exists () {
+        static std::map<id_type, std::map<std::string, bool>> *element_exists = new std::map<id_type, std::map<std::string, bool>>();
+        return *element_exists;
+    }
 
-    std::map<id_type, bool> poset_exists;
+    std::map<id_type, bool> &get_poset_exists () {
+        static std::map<id_type, bool> *poset_exists = new std::map<id_type, bool>();
+        return *poset_exists;
+    }
 
-    std::map<std::string, bool> visited;
+    std::map<std::string, bool> &get_visited () {
+        static std::map<std::string, bool> *visited = new std::map<std::string, bool>();
+        return *visited;
+    }
 
     // funkcja pomocnicza do skopiowania nazwy elementu
     std::string copyName(char const *value) {
@@ -63,27 +83,27 @@ namespace {
     }
 
     void add_relation(id_type id, std::string name1, std::string name2) {
-        graph[id][name1].insert(name2);
-        transposed_graph[id][name2].insert(name1);
+        get_graph()[id][name1].insert(name2);
+        get_transposed_graph()[id][name2].insert(name1);
 
         return;
     }
 
     void delete_relation(id_type id, std::string name1, std::string name2) {
-        auto it1 = graph[id][name1].find(name2);
-        graph[id][name1].erase(it1);
+        auto it1 = get_graph()[id][name1].find(name2);
+        get_graph()[id][name1].erase(it1);
 
-        auto it2 = transposed_graph[id][name2].find(name1);
-        transposed_graph[id][name2].erase(it2);
+        auto it2 = get_transposed_graph()[id][name2].find(name1);
+        get_transposed_graph()[id][name2].erase(it2);
 
         return;
     }
 
     void dfs(std::string node, id_type id) {
-        visited[node] = true;
+        get_visited()[node] = true;
 
-        for (auto v:graph[id][node]) {
-            if (visited[v] == false) {
+        for (auto v:get_graph()[id][node]) {
+            if (get_visited()[v] == false) {
                 dfs(v, id);
             }
         }
@@ -91,37 +111,38 @@ namespace {
         return;
     }
 
-
 }
 
 
 namespace jnp1 {
 
     id_type poset_new(void) {
+        debugStream << "poset_new()" << std::endl;
+        
         id_type newId;
 
-        if (free_ids.empty() == false) {
-            newId = free_ids.back();
-            free_ids.pop_back();
+        if (get_free_ids().empty() == false) {
+            newId = get_free_ids().back();
+            get_free_ids().pop_back();
         } else {
             globalCounter += 1;
             newId = globalCounter;
         }
 
-        poset_exists[newId] = true;
+        get_poset_exists()[newId] = true;
 
         return newId;
     }
 
     void poset_delete(id_type id) {
-        if (poset_exists[id] == true) {
-            poset_exists[id] = false;
-            poset_active_elements[id] = 0;
-            element_exists[id].clear();
-            graph[id].clear();
-            transposed_graph[id].clear();
+        if (get_poset_exists()[id] == true) {
+            get_poset_exists()[id] = false;
+            get_poset_active_elements()[id] = 0;
+            get_element_exists()[id].clear();
+            get_graph()[id].clear();
+            get_transposed_graph()[id].clear();
 
-            free_ids.push_back(id);
+            get_free_ids().push_back(id);
 
             // pomyslnie usunieto poset
         } else {
@@ -130,8 +151,8 @@ namespace jnp1 {
     }
 
     size_t poset_size(id_type id) {
-        if (poset_exists[id] == true) {
-            return poset_active_elements[id];
+        if (get_poset_exists()[id] == true) {
+            return get_poset_active_elements()[id];
         } else {
             // poset o takim numerze nie istnieje
             return 0;
@@ -139,16 +160,16 @@ namespace jnp1 {
     }
 
     bool poset_insert(id_type id, char const *value) {
-        if (poset_exists[id] == true) {
+        if (get_poset_exists()[id] == true) {
             if (check_name(value) == false) {
                 return false;
             }
 
             std::string copiedName = copyName(value);
 
-            if (element_exists[id][copiedName] == false) {
-                element_exists[id][copiedName] = true;
-                poset_active_elements[id] += 1;
+            if (get_element_exists()[id][copiedName] == false) {
+                get_element_exists()[id][copiedName] = true;
+                get_poset_active_elements()[id] += 1;
 
                 add_relation(id, copiedName, copiedName);
 
@@ -165,36 +186,36 @@ namespace jnp1 {
     }
 
     bool poset_remove(id_type id, char const *value) {
-        if (poset_exists[id]) {
+        if (get_poset_exists()[id]) {
             if (check_name(value) == false) {
                 return false;
             }
 
             std::string name = copyName(value);
 
-            if (element_exists[id][name] == false) {
+            if (get_element_exists()[id][name] == false) {
                 // element nie istnieje
 
                 return false;
             }
 
-            for (auto v:graph[id][name]) {
-                auto it = transposed_graph[id][v].find(name);
-                transposed_graph[id][v].erase(it);
+            for (auto v:get_graph()[id][name]) {
+                auto it = get_transposed_graph()[id][v].find(name);
+                get_transposed_graph()[id][v].erase(it);
             }
 
-            graph[id][name].clear();
+            get_graph()[id][name].clear();
 
-            for (auto v:transposed_graph[id][name]) {
-                auto it = graph[id][v].find(name);
-                graph[id][v].erase(it);
+            for (auto v:get_transposed_graph()[id][name]) {
+                auto it = get_graph()[id][v].find(name);
+                get_graph()[id][v].erase(it);
             }
 
-            transposed_graph[id][name].clear();
+            get_transposed_graph()[id][name].clear();
 
-            element_exists[id][name] = false;
+            get_element_exists()[id][name] = false;
 
-            poset_active_elements[id] -= 1;
+            get_poset_active_elements()[id] -= 1;
 
             return true;
         } else {
@@ -205,7 +226,7 @@ namespace jnp1 {
 
 
     bool poset_add(id_type id, char const *value1, char const *value2) {
-        if (poset_exists[id]) {
+        if (get_poset_exists()[id]) {
             if (check_name(value1) == false || check_name(value2) == false) {
                 return false;
             }
@@ -213,20 +234,20 @@ namespace jnp1 {
             std::string name1 = copyName(value1);
             std::string name2 = copyName(value2);
 
-            if (element_exists[id][name1] == false ||
-                element_exists[id][name2] == false) {
+            if (get_element_exists()[id][name1] == false ||
+                get_element_exists()[id][name2] == false) {
                 // ktorys z elementow nie istnieje
 
                 return false;
             }
 
-            if (graph[id][name1].find(name2) != graph[id][name1].end() ||
-                graph[id][name2].find(name1) != graph[id][name2].end()) {
+            if (get_graph()[id][name1].find(name2) != get_graph()[id][name1].end() ||
+                get_graph()[id][name2].find(name1) != get_graph()[id][name2].end()) {
                 // relacja nie moze byc dodana
                 return false;
             } else {
-                for (auto v:transposed_graph[id][name1]) {
-                    for (auto u:graph[id][name2]) {
+                for (auto v:get_transposed_graph()[id][name1]) {
+                    for (auto u:get_graph()[id][name2]) {
                         add_relation(id, v, u);
                     }
                 }
@@ -241,7 +262,7 @@ namespace jnp1 {
     }
 
     bool poset_del(id_type id, char const *value1, char const *value2) {
-        if (poset_exists[id]) {
+        if (get_poset_exists()[id]) {
             if (check_name(value1) == false || check_name(value2) == false) {
                 return false;
             }
@@ -249,21 +270,21 @@ namespace jnp1 {
             std::string name1 = copyName(value1);
             std::string name2 = copyName(value2);
 
-            if (element_exists[id][name1] == false ||
-                element_exists[id][name2] == false) {
+            if (get_element_exists()[id][name1] == false ||
+                get_element_exists()[id][name2] == false) {
                 // ktorys z elementow nie istnieje
 
                 return false;
             }
 
-            if (graph[id][name1].find(name2) != graph[id][name1].end()) {
+            if (get_graph()[id][name1].find(name2) != get_graph()[id][name1].end()) {
                 delete_relation(id, name1, name2);
 
-                visited.clear();
+                get_visited().clear();
 
                 dfs(name1, id);
 
-                if (visited[name2] == true) {
+                if (get_visited()[name2] == true) {
                     // usuniecie relacji zaburzy czesciowy porzadek
                     add_relation(id, name1, name2);
 
@@ -282,7 +303,7 @@ namespace jnp1 {
     }
 
     bool poset_test(id_type id, char const *value1, char const *value2) {
-        if (poset_exists[id]) {
+        if (get_poset_exists()[id]) {
             if (check_name(value1) == false || check_name(value2) == false) {
                 return false;
             }
@@ -290,14 +311,14 @@ namespace jnp1 {
             std::string name1 = copyName(value1);
             std::string name2 = copyName(value2);
 
-            if (element_exists[id][name1] == false ||
-                element_exists[id][name2] == false) {
+            if (get_element_exists()[id][name1] == false ||
+                get_element_exists()[id][name2] == false) {
                 // ktorys z elementow nie istnieje
 
                 return false;
             }
 
-            if (graph[id][name1].find(name2) != graph[id][name1].end()) {
+            if (get_graph()[id][name1].find(name2) != get_graph()[id][name1].end()) {
                 // relacja istnieje
                 return true;
             } else {
@@ -311,11 +332,11 @@ namespace jnp1 {
     }
 
     void poset_clear(id_type id) {
-        if (poset_exists[id]) {
-            poset_active_elements[id] = 0;
-            element_exists[id].clear();
-            graph[id].clear();
-            transposed_graph[id].clear();
+        if (get_poset_exists()[id]) {
+            get_poset_active_elements()[id] = 0;
+            get_element_exists()[id].clear();
+            get_graph()[id].clear();
+            get_transposed_graph()[id].clear();
 
             return;
         } else {
