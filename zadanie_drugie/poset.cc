@@ -148,7 +148,7 @@ namespace jnp1 {
 
             get_free_ids().push_back(id);
 
-            debug << ": poset " << id << " deleted" << std::endl; 
+            debug << ": poset " << id << " deleted" << std::endl;
         } else {
             debug << ": poset " << id << " does not exist" << std::endl;
         }
@@ -241,7 +241,7 @@ namespace jnp1 {
         if (get_poset_exists()[id]) {
             if (!check_name(value1) || !check_name(value2)) {
                 if (!check_name(value1)) {
-                    debug << ": invalid value1 " << bracketString(value1) << std::endl;  
+                    debug << ": invalid value1 " << bracketString(value1) << std::endl;
                 }
                 if (!check_name(value2)) {
                     debug << ": invalid value2 " << bracketString(value2) << std::endl;
@@ -254,7 +254,8 @@ namespace jnp1 {
 
             if (!get_element_exists()[id][name1] ||
                 !get_element_exists()[id][name2]) {
-                debug << ": poset " << id << ", element " << prettyString(value1) << " or " << prettyString(value2) << " does not exist" << std::endl;
+                debug << ": poset " << id << ", element " << prettyString(value1) << " or " << prettyString(value2)
+                      << " does not exist" << std::endl;
                 return false;
             }
 
@@ -262,7 +263,8 @@ namespace jnp1 {
                 get_graph()[id][name1].end() ||
                 get_graph()[id][name2].find(name1) !=
                 get_graph()[id][name2].end()) {
-                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2) << ") cannot be added" << std::endl;
+                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                      << ") cannot be added" << std::endl;
                 return false;
             } else {
                 for (auto v:get_transposed_graph()[id][name1]) {
@@ -270,7 +272,8 @@ namespace jnp1 {
                         add_relation(id, v, u);
                     }
                 }
-                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2) << ") added" << std::endl;
+                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                      << ") added" << std::endl;
                 return true;
             }
 
@@ -286,7 +289,7 @@ namespace jnp1 {
         if (get_poset_exists()[id]) {
             if (!check_name(value1) || !check_name(value2)) {
                 if (!check_name(value1)) {
-                    debug << ": invalid value1 " << bracketString(value1) << std::endl;  
+                    debug << ": invalid value1 " << bracketString(value1) << std::endl;
                 }
                 if (!check_name(value2)) {
                     debug << ": invalid value2 " << bracketString(value2) << std::endl;
@@ -299,7 +302,8 @@ namespace jnp1 {
 
             if (!get_element_exists()[id][name1] ||
                 !get_element_exists()[id][name2]) {
-                debug << ": poset " << id << ", element " << prettyString(value1) << " or " << prettyString(value2) << " does not exist" << std::endl;
+                debug << ": poset " << id << ", element " << prettyString(value1) << " or " << prettyString(value2)
+                      << " does not exist" << std::endl;
                 return false;
             }
 
@@ -312,15 +316,18 @@ namespace jnp1 {
                 dfs(name1, id);
 
                 if (get_visited()[name2]) {
-                    debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2) << ") cannot be deleted" << std::endl;
+                    debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                          << ") cannot be deleted" << std::endl;
                     add_relation(id, name1, name2);
                     return false;
                 } else {
-                    debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2) << ") deleted" << std::endl;
+                    debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                          << ") deleted" << std::endl;
                     return true;
                 }
             } else {
-                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2) << ") does not exist" << std::endl;
+                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                      << ") does not exist" << std::endl;
                 return false;
             }
         } else {
@@ -334,7 +341,7 @@ namespace jnp1 {
         if (get_poset_exists()[id]) {
             if (!check_name(value1) || !check_name(value2)) {
                 if (!check_name(value1)) {
-                    debug << ": invalid value1 " << bracketString(value1) << std::endl;  
+                    debug << ": invalid value1 " << bracketString(value1) << std::endl;
                 }
                 if (!check_name(value2)) {
                     debug << ": invalid value2 " << bracketString(value2) << std::endl;
@@ -347,16 +354,19 @@ namespace jnp1 {
 
             if (!get_element_exists()[id][name1] ||
                 !get_element_exists()[id][name2]) {
-                debug << ": poset " << id << ", element " << prettyString(value1) << " or " << prettyString(value2) << " does not exist" << std::endl;
+                debug << ": poset " << id << ", element " << prettyString(value1) << " or " << prettyString(value2)
+                      << " does not exist" << std::endl;
                 return false;
             }
 
             if (get_graph()[id][name1].find(name2) !=
                 get_graph()[id][name1].end()) {
-                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2) << ") exists" << std::endl;
+                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                      << ") exists" << std::endl;
                 return true;
             } else {
-                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2) << ") does not exists" << std::endl;
+                debug << ": poset " << id << ", relation (" << prettyString(value1) << ", " << prettyString(value2)
+                      << ") does not exists" << std::endl;
                 return false;
             }
         } else {
