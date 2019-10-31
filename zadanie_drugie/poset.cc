@@ -30,14 +30,12 @@ namespace {
         return *free_ids;
     }
 
-    std::map<id_type, std::map<std::string, std::set<std::string>>> &
-    get_graph() {
+    std::map<id_type, std::map<std::string, std::set<std::string>>> &get_graph() {
         static std::map<id_type, std::map<std::string, std::set<std::string>>> *graph = new std::map<id_type, std::map<std::string, std::set<std::string>>>();
         return *graph;
     }
 
-    std::map<id_type, std::map<std::string, std::set<std::string>>> &
-    get_transposed_graph() {
+    std::map<id_type, std::map<std::string, std::set<std::string>>> &get_transposed_graph() {
         static std::map<id_type, std::map<std::string, std::set<std::string>>> *transposed_graph = new std::map<id_type, std::map<std::string, std::set<std::string>>>();
         return *transposed_graph;
     }
