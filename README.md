@@ -15,6 +15,8 @@ Rozwiązanie znajduje się w folderze [zadanie_pierwsze](/zadanie_pierwsze).
 Moduł obsługujący zbiory częściowo uporządkowane (ang. poset), których elementami są napisy. Moduł ma być używany w C.
 Rozwiązanie znajduje się w folderze [zadanie_drugie](/zadanie_drugie).
 
+## Zadanie 3.
+Klasa obsługująca liczby w systemie fibonacciego. Rozwiązanie będzie znajować sie [tutaj](/zadanie_trzecie).
 
 ## Obsługa svn:
 
