@@ -44,6 +44,12 @@ public:
 
     friend bool operator!=(const Fibo &a, const Fibo &b);
 
+    friend bool operator<=(const Fibo &a, const Fibo &b);
+
+    friend bool operator>(const Fibo &a, const Fibo &b);
+
+    friend bool operator>=(const Fibo &a, const Fibo &b);
+
     /* OPERATORY x= */
 
     Fibo &operator+=(const Fibo &f);

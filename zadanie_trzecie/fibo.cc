@@ -41,7 +41,6 @@ Fibo::Fibo(const int x) : Fibo(create_string(x)) {};
 
 Fibo::Fibo(const unsigned long long x) : Fibo(create_string(x)) {};
 
-
 // OPERATORY i reszta.
 
 [[nodiscard]] size_t Fibo::length() const {
@@ -49,8 +48,8 @@ Fibo::Fibo(const unsigned long long x) : Fibo(create_string(x)) {};
 }
 
 Fibo &Fibo::operator+=(const Fibo &second) {
-    //Tworzymy bufor długości 5 zerowych fibitów.
-    value.resize(std::max(length(), second.length()) + 5, false);
+    //Tworzymy bufor długości 10 zerowych fibitów.
+    value.resize(std::max(length(), second.length()) + 10, false);
     //Liczby dodajemy od najmniej znaczącego fibitu.
     for (size_t pos = 0; pos < length(); pos++) {
         //Jeżeli w drugiej liczbie nie ma już fibitów nie musimy dodawać dalej.
@@ -169,8 +168,8 @@ const Fibo Fibo::operator<<(const int x) const {
 }
 
 
-std::ostream &operator<<(std::ostream &stream, const Fibo &lhs) {
-    for (auto it = lhs.value.rbegin(); it != lhs.value.rend(); it++) {
+std::ostream &operator<<(std::ostream &stream, const Fibo &f) {
+    for (auto it = f.value.rbegin(); it != f.value.rend(); it++) {
         stream << *it;
     }
     return stream;
@@ -178,8 +177,8 @@ std::ostream &operator<<(std::ostream &stream, const Fibo &lhs) {
 
 
 const Fibo &Zero() {
-    static const Fibo *val0 = new Fibo();
-    return *val0;
+    static const Fibo *f = new Fibo();
+    return *f;
 }
 
 const Fibo &One() {
@@ -189,7 +188,6 @@ const Fibo &One() {
 
 
 /* PRYWATNE */
-
 
 std::string Fibo::create_string(long long x) {
     std::string s = "";
@@ -221,6 +219,7 @@ void Fibo::clean_back() {
         value.pop_back();
     }
 }
+
 
 void Fibo::normalize() {
     //Zakladamy, że mamy zapis fibitów w wektorze od najmniej istotnego.
