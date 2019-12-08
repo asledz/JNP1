@@ -1,0 +1,23 @@
+1 7:00 Banacha 8:00 Pasteura 9:00 Winnicka
+2 6:00 Winnicka 7:00 Banacha 8:00 Pasteura
+3 8:00 Winnicka 9:00 Banacha
+# Jadziemy bez biletów?
+? Banacha 1 Pasteura
+# Kupujemy trzy razy ten sam bilet.
+TenTrzyRazy 111.11 24
+? Banacha 1 Pasteura
+# Połączenie jest za długie, nie da sie znaleźć.
+? Banacha 1 Winnicka
+# Teraz wystarczą dwa bilety.
+GodzinaMinuta 88.88 61
+? Banacha 1 Winnicka
+# Połączenie jest z przesiadką.
+? Winnicka 2 Banacha 1 Pasteura
+# Czy obliczenia są dokładne? Zaraz zobaczymy.
+DokladnieGodzina 88.87 60
+GodzinaBezMinuty 88.87 59
+? Banacha 1 Winnicka
+# Definiujemy kilka takich samych biletów.
+TakiJakByl 88.87 59
+TakiJakByl 88.87 59
+TakiJakByl 88.87 59

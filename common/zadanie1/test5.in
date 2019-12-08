@@ -1,0 +1,71 @@
+1 6:00 A 7:00 B 8:00 C
+2 7:00 A 8:00 B 9:00 C
+3 9:00 B 10:00 C 11:00 D
+
+# Czy jak mamy pytanie o bilet, a zaden bilet nie zostal dodany , to uznajemy zapytanie za bledne czy uznajemy ze nie mozna kupic biletow na podana trase ?
+? A 1 B
+
+# Jaką nazwę przystanku wypisać, jeśli jest więcej niż jeden przystanek na którym trzeba czekać?
+# Nazwę pierwszego z nich
+Bilecik 1000.00 120
+? A 1 B 2 C 3 D
+
+# Czy jeżeli dostajemy wiersz o dodaniu kursu lub biletu i kurs o danym numerze / bilet o danej nazwie zostały dodane wcześniej, to czy mamy wypisać błąd czy nadpisać czy zignorować wiersz?
+# Wypisać jako błąd.
+1 6:00 A 7:00 B 8:00 C
+Bilecik 1000.00 120
+
+# Numer kursu jest nieujemny, ale może to być 0.
+0 6:00 Banacha 7:00 Pasteura
+
+
+# Czy obie godziny 9:13 i 09:13 są poprawnymi formatami?
+# Nie.
+4 09:00 B 10:00 C 11:00 D
+
+# Czy podawane w zapytaniach numery linii tramwajowych też mogą mieć zera wiodące?
+# Tak.
+? A 01 B
+
+# Czy między argumentami znajduje się tylko jedna spacja, czy dowolnie większa?
+# Jedna (format linii jest dokładnie taki jak w treści).
+5  8:00  B 09:00 C 10:00 D
+6 8:00 B  09:00 C 10:00 D
+7 8:00 B 09:00  C 10:00 D
+8 8:00 B 09:00 C  10:00 D
+9 8:00 B 09:00 C 10:00 D
+
+# Czy są górne ograniczenia na wartości numeru kursu, ceny i czasu ważności biletu?
+# Można przyjąć jakieś rozsądne ograniczenia, dokładnie jakie pozostawiamy do decyzji implementującego.
+# -> to trochę testuje test 6
+
+# Czy w przypadku, w którym zaproponowana przez użytkownika droga jednocześnie wymaga czekania i nie daje się zrealizować przy pomocy maksymalnie 3 biletów to wypisujemy :-( nazwa_przystanku_gdzie_trzeba_czekać czy :-| ?
+# :-( nazwa_przystanku_gdzie_trzeba_czekać
+10 6:00 A 20:00 B
+? A 10 B
+
+# Czy jeśli w pytaniu o bilety:
+# 1) któryś z numerów kursów nie został wcześniej dodany
+? A 11 B
+# 2) trasa któregoś z kursów nie prowadzi przez dany przystanek
+? A 2 D
+# 3) godzina przyjazdu na przystanek jest późniejsza niż godzina odjazdu kolejnego kursu
+? A 2 B 1 C
+# to w których przypadkach należy uznać wiersz za niepoprawny i wypisać błąd, a w których należy wypisać, że nie da się kupić biletów?
+#  
+# We wszystkich tych przypadkach uznajemy wiersz za niepoprawny.
+
+# Jaka jest minimalna argumentów przystanek_i w zapytaniach typu 1. i 3.? W szczególności, czy linie "12" lub "?" są poprawne?
+# Linia musi mieć jakiś przystanek, pytanie o bilety musi obejmować co najmniej jeden odcinek. W szczególności nie są.
+11
+?
+
+# Czy komendy mogą mieć spacje na początku/końcu linii 
+    14 21:22 Warszawa 21:23 Boston   
+
+# Kilka optymalnych zestawów na tę samą trasę
+# Skrypt sprawdzający usuwa napis IGNORUJ...
+Bilet 0.01 100
+BiletIGNORUJTENNAPIS 0.01 100
+? A 1 B
+
