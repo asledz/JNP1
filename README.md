@@ -18,6 +18,9 @@ Rozwiązanie znajduje się w folderze [zadanie_drugie](/zadanie_drugie).
 ## Zadanie 3.
 Klasa obsługująca liczby w systemie fibonacciego. Rozwiązanie będzie znajować sie [tutaj](/zadanie_trzecie).
 
+## Zadanie 4.
+Implementacja prostego języku funkcyjnego oraz jego interpretera, oparte o szablony w C++. Rozwiązanie znajduje się [tutaj](/zadanie_czwarte).
+
 ## Obsługa svn:
 
 Dodawanie pliku do repo:
