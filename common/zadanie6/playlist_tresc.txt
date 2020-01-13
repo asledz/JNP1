@@ -122,7 +122,7 @@ corrupt content
 
 = Rozwiązanie =
 
-Rozwiązanie musi zawierać plik nagłówkowy playlist.h, dający dostęp do całego publicznego
+Rozwiązanie musi zawierać plik nagłówkowy lib_playlist.h, dający dostęp do całego publicznego
 interfejsu biblioteki. Oprócz tego rozwiązanie może zawierać dodatkowe pliki nagłówkowe *.h
 z opcjonalnymi odpowiadającymi im plikami źródłowymi *.cc.
 
