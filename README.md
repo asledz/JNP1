@@ -21,6 +21,9 @@ Klasa obsługująca liczby w systemie fibonacciego. Rozwiązanie będzie znajowa
 ## Zadanie 4.
 Implementacja prostego języku funkcyjnego oraz jego interpretera, oparte o szablony w C++. Rozwiązanie znajduje się [tutaj](/zadanie_czwarte).
 
+## Zadanie 6.
+Implementacja struktury mapy, z dostępem do elementu w O(1) i O(1). Rozwiązanie znajduje się [tutaj](/zadanie_piate).
+
 ## Obsługa svn:
 
 Dodawanie pliku do repo:
