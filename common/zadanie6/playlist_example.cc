@@ -7,13 +7,13 @@ int main() {
     auto mishmash = player.createPlaylist("mishmash");
     auto armstrong = player.createPlaylist("armstrong");
     auto whatAWonderfulWorld = player.openFile(File("audio|artist:Louis Armstrong|title:What a Wonderful World|"
-                                                            "I see trees of green, red roses too..."));
+                                                    "I see trees of green, red roses too..."));
     auto helloDolly = player.openFile(File("audio|artist:Louis Armstrong|title:Hello, Dolly!|"
-                                                   "Hello, Dolly! This is Louis, Dolly"));
+                                           "Hello, Dolly! This is Louis, Dolly"));
     armstrong->add(whatAWonderfulWorld);
     armstrong->add(helloDolly);
     auto direstraits = player.openFile(File("audio|artist:Dire Straits|title:Money for Nothing|"
-                                                    "Now look at them yo-yo's that's the way you do it..."));
+                                            "Now look at them yo-yo's that's the way you do it..."));
     auto cabaret = player.openFile(File("video|title:Cabaret|year:1972|Qvfcynlvat Pnonerg"));
 
 

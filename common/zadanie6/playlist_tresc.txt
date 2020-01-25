@@ -86,7 +86,8 @@ zgodnie z zasadą Open-Closed Principle z zasad SOLID.
 
 = Przykład użycia =
 
-Przykład wykorzystania biblioteki znajduje się w pliku playlist_example.cc, a wynik jego uruchomienia to:
+Przykład wykorzystania biblioteki znajduje się w pliku playlist_example.cc,
+a wynik jego uruchomienia na Linuksie to:
 
 === Playing 'mishmash' (default sequence mode)
 Playlist [mishmash]
@@ -101,9 +102,9 @@ Playlist [mishmash]
 Playlist [armstrong]
 Song [Louis Armstrong, What a Wonderful World]: I see trees of green, red roses too...
 Song [Louis Armstrong, Hello, Dolly!]: Hello, Dolly! This is Louis, Dolly
+Song [Dire Straits, Money for Nothing]: Now look at them yo-yo's that's the way you do it...
+Song [Dire Straits, Money for Nothing]: Now look at them yo-yo's that's the way you do it...
 Movie [Cabaret, 1972]: Displaying Cabaret
-Song [Dire Straits, Money for Nothing]: Now look at them yo-yo's that's the way you do it...
-Song [Dire Straits, Money for Nothing]: Now look at them yo-yo's that's the way you do it...
 === Playing 'mishmash' (removed cabaret and last direstraits, odd-even mode)
 Playlist [mishmash]
 Playlist [armstrong]
